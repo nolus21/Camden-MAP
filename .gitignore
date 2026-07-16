@@ -1,0 +1,23 @@
+# Claude Code local config — CONTAINS SECRETS, never commit
+.claude/
+
+# Dependencies
+node_modules/
+
+# Logs & OS junk
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Env / secrets
+.env
+.env.*
+*.local
+
+# Editor
+.vscode/
+.idea/
+
+# Vercel
+.vercel/

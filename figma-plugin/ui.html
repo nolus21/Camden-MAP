@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { font-family: Inter, sans-serif; font-size: 12px; margin: 0; padding: 16px; background: #fff; color: #1a1a1a; }
+  h3 { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
+  p { margin: 0 0 12px; color: #666; line-height: 1.5; }
+  button { width: 100%; padding: 10px; background: #18a0fb; border: none; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 4px; }
+  button:hover { background: #0d8de0; }
+  button:disabled { background: #bbb; cursor: not-allowed; }
+  #status { margin-top: 12px; padding: 8px 10px; border-radius: 4px; font-size: 11px; display: none; }
+  #status.info  { background: #e8f4fd; color: #0d6ea0; display: block; }
+  #status.ok    { background: #e6f4ea; color: #1e7e34; display: block; }
+  #status.error { background: #fdecea; color: #c0392b; display: block; }
+  .count { font-size: 11px; color: #888; margin-top: 4px; }
+</style>
+</head>
+<body>
+<h3>Camden Cards — Notion Sync</h3>
+<p>Fetches all intervention cards from Notion and populates copies of your card template on the canvas.</p>
+<button id="btn">Sync cards from Notion</button>
+<div id="status"></div>
+
+<script>
+  const WORKER = 'https://camden-notion-proxy.aleks-208.workers.dev/cards';
+
+  document.getElementById('btn').onclick = async () => {
+    const btn = document.getElementById('btn');
+    const st  = document.getElementById('status');
+    btn.disabled = true;
+    st.className = 'info';
+    st.textContent = 'Fetching cards from Notion…';
+
+    try {
+      const res   = await fetch(WORKER);
+      const cards = await res.json();
+      if (!Array.isArray(cards)) throw new Error(cards.error || 'Unexpected response');
+      st.textContent = `Got ${cards.length} cards — building frames…`;
+      parent.postMessage({ pluginMessage: { type: 'sync', cards } }, '*');
+    } catch (e) {
+      st.className = 'error';
+      st.textContent = 'Fetch failed: ' + e.message;
+      btn.disabled = false;
+    }
+  };
+
+  window.onmessage = (e) => {
+    const msg = e.data.pluginMessage;
+    if (!msg) return;
+    const st = document.getElementById('status');
+    if (msg.type === 'done') {
+      st.className = 'ok';
+      st.textContent = msg.text;
+      document.getElementById('btn').disabled = false;
+    } else if (msg.type === 'error') {
+      st.className = 'error';
+      st.textContent = msg.text;
+      document.getElementById('btn').disabled = false;
+    } else if (msg.type === 'progress') {
+      st.className = 'info';
+      st.textContent = msg.text;
+    }
+  };
+</script>
+</body>
+</html>

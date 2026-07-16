@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camden Food System — Combined</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --hdr:46px;
+    --bg:#0B0F0A;
+    --bar:#0F1710;
+    --border:rgba(150,170,140,.14);
+    --text:#C7D2BC;
+    --dim:#7A8A70;
+    --accent:#6BA876;
+    font:13px/1.4 'Segoe UI',system-ui,-apple-system,sans-serif;
+  }
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text)}
+
+  /* ── Header ── */
+  #hdr{height:var(--hdr);background:var(--bar);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;padding:0 16px;
+    position:relative;z-index:10;flex-shrink:0}
+  .brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+  .brand .eyebrow{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+    font-family:Consolas,monospace}
+  .brand .title{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;
+    font-family:'Palatino Linotype',Georgia,serif;font-style:italic}
+
+  /* ── Segmented view switcher ── */
+  #seg{display:flex;gap:0;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:rgba(0,0,0,.2)}
+  #seg button{appearance:none;background:none;border:0;border-right:1px solid var(--border);
+    color:var(--dim);font:inherit;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    padding:6px 15px;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:6px}
+  #seg button:last-child{border-right:0}
+  #seg button:hover{color:var(--text);background:rgba(107,168,118,.08)}
+  #seg button.active{background:var(--accent);color:#0B0F0A;font-weight:600}
+  .seg-ico{font-size:13px;line-height:1}
+
+  .hdr-right{display:flex;align-items:center;gap:14px}
+  .hdr-link{font-size:10px;color:var(--dim);text-decoration:none;letter-spacing:.05em;
+    font-family:Consolas,monospace;border-bottom:1px dotted transparent}
+  .hdr-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* ── Stage: the two panes ── */
+  #stage{position:absolute;top:var(--hdr);left:0;right:0;bottom:0;display:flex}
+  .pane{position:relative;height:100%;overflow:hidden;min-width:0;background:var(--bg)}
+  .pane iframe{display:block;width:100%;height:100%;border:0}
+  #pane-wheel{flex:1 1 50%}
+  #pane-map{flex:1 1 50%}
+
+  /* divider (split mode only) */
+  #divider{flex:0 0 6px;background:var(--border);cursor:col-resize;position:relative;display:none;
+    transition:background .14s}
+  #divider:hover,#divider.dragging{background:var(--accent)}
+  #divider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:2px;height:26px;background:rgba(255,255,255,.35);border-radius:2px}
+
+  /* mode states */
+  body[data-view="wheel"] #pane-map,body[data-view="wheel"] #divider{display:none}
+  body[data-view="wheel"] #pane-wheel{flex:1 1 100%}
+  body[data-view="map"] #pane-wheel,body[data-view="map"] #divider{display:none}
+  body[data-view="map"] #pane-map{flex:1 1 100%}
+  body[data-view="split"] #divider{display:block}
+
+  /* pane label chip (split mode) */
+  .pane-tag{position:absolute;top:8px;left:8px;z-index:5;pointer-events:none;
+    font-size:8px;letter-spacing:.14em;text-transform:uppercase;font-family:Consolas,monospace;
+    color:var(--dim);background:rgba(11,15,10,.72);border:1px solid var(--border);
+    padding:2px 7px;border-radius:4px;opacity:0;transition:opacity .2s}
+  body[data-view="split"] .pane-tag{opacity:1}
+
+  /* loading placeholder */
+  .pane-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:var(--dim);font-family:Consolas,monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;background:var(--bg);z-index:3}
+  .pane-loading.hidden{display:none}
+
+  /* while dragging the divider, disable iframe pointer events so drag stays smooth */
+  body.resizing iframe{pointer-events:none}
+  body.resizing{cursor:col-resize}
+
+  @media(max-width:720px){
+    .brand .eyebrow{display:none}
+    #seg button{padding:6px 10px}
+    #seg button span.lbl{display:none}
+  }
+</style>
+</head>
+<body data-view="wheel">
+  <header id="hdr">
+    <div class="brand">
+      <span class="eyebrow">Dark Matter Labs</span>
+      <span class="title">Camden Food System</span>
+    </div>
+    <div id="seg" role="tablist" aria-label="View">
+      <button data-view="wheel" class="active" title="System & portfolio wheel"><span class="seg-ico">&#9673;</span><span class="lbl">Wheel</span></button>
+      <button data-view="split" title="Wheel + map side by side"><span class="seg-ico">&#9707;</span><span class="lbl">Split</span></button>
+      <button data-view="map" title="Physical borough map"><span class="seg-ico">&#9635;</span><span class="lbl">Map</span></button>
+    </div>
+    <div class="hdr-right">
+      <a class="hdr-link" href="sovereign-food-system.html" target="_blank" rel="noopener">wheel &#8599;</a>
+      <a class="hdr-link" href="index.html" target="_blank" rel="noopener">map &#8599;</a>
+    </div>
+  </header>
+
+  <div id="stage">
+    <div class="pane" id="pane-wheel">
+      <span class="pane-tag">System &amp; Portfolio</span>
+      <div class="pane-loading" id="load-wheel">Loading wheel…</div>
+      <iframe id="if-wheel" title="Sovereign Food System wheel" allow="microphone"></iframe>
+    </div>
+    <div id="divider" title="Drag to resize"></div>
+    <div class="pane" id="pane-map">
+      <span class="pane-tag">Borough Map</span>
+      <div class="pane-loading" id="load-map">Loading map…</div>
+      <iframe id="if-map" title="Camden Food Systems Risk Intelligence map" allow="microphone; geolocation"></iframe>
+    </div>
+  </div>
+
+<script>
+(function(){
+  var SRC={
+    wheel:'sovereign-food-system.html',
+    map:'index.html'
+  };
+  var loaded={wheel:false,map:false};
+  var body=document.body;
+
+  // Lazy-load an iframe the first time its pane becomes visible
+  function ensureLoaded(which){
+    if(loaded[which])return;
+    loaded[which]=true;
+    var f=document.getElementById(which==='wheel'?'if-wheel':'if-map');
+    var loader=document.getElementById(which==='wheel'?'load-wheel':'load-map');
+    f.addEventListener('load',function(){ if(loader)loader.classList.add('hidden'); });
+    f.src=SRC[which];
+  }
+
+  function setView(v){
+    body.setAttribute('data-view',v);
+    // load whatever the view needs
+    if(v==='wheel'){ensureLoaded('wheel');}
+    else if(v==='map'){ensureLoaded('map');}
+    else{ensureLoaded('wheel');ensureLoaded('map');}
+    // reflect on buttons
+    [].forEach.call(document.querySelectorAll('#seg button'),function(b){
+      b.classList.toggle('active',b.getAttribute('data-view')===v);
+    });
+    // nudge iframes to re-measure (maps/canvas often need a resize kick)
+    setTimeout(function(){
+      try{
+        var w=document.getElementById('if-wheel').contentWindow;
+        var m=document.getElementById('if-map').contentWindow;
+        w&&w.dispatchEvent(new Event('resize'));
+        m&&m.dispatchEvent(new Event('resize'));
+      }catch(e){}
+    },60);
+    try{localStorage.setItem('camden_view',v);}catch(e){}
+  }
+
+  [].forEach.call(document.querySelectorAll('#seg button'),function(b){
+    b.addEventListener('click',function(){setView(b.getAttribute('data-view'));});
+  });
+
+  // ── Split divider drag ──
+  var divider=document.getElementById('divider');
+  var stage=document.getElementById('stage');
+  var paneW=document.getElementById('pane-wheel');
+  var paneM=document.getElementById('pane-map');
+  var dragging=false;
+  divider.addEventListener('pointerdown',function(e){
+    dragging=true;divider.classList.add('dragging');body.classList.add('resizing');
+    divider.setPointerCapture(e.pointerId);
+  });
+  divider.addEventListener('pointermove',function(e){
+    if(!dragging)return;
+    var rect=stage.getBoundingClientRect();
+    var ratio=(e.clientX-rect.left)/rect.width;
+    ratio=Math.max(0.18,Math.min(0.82,ratio));
+    paneW.style.flex='0 0 '+(ratio*100)+'%';
+    paneM.style.flex='1 1 auto';
+  });
+  function endDrag(e){
+    if(!dragging)return;
+    dragging=false;divider.classList.remove('dragging');body.classList.remove('resizing');
+    try{
+      var w=document.getElementById('if-wheel').contentWindow;
+      var m=document.getElementById('if-map').contentWindow;
+      w&&w.dispatchEvent(new Event('resize'));
+      m&&m.dispatchEvent(new Event('resize'));
+    }catch(err){}
+  }
+  divider.addEventListener('pointerup',endDrag);
+  divider.addEventListener('pointercancel',endDrag);
+
+  // Keyboard: 1 wheel, 2 split, 3 map
+  document.addEventListener('keydown',function(e){
+    if(e.target&&/input|textarea/i.test(e.target.tagName))return;
+    if(e.key==='1')setView('wheel');
+    else if(e.key==='2')setView('split');
+    else if(e.key==='3')setView('map');
+  });
+
+  // Restore last view (default wheel)
+  var start='wheel';
+  try{var saved=localStorage.getItem('camden_view');if(saved)start=saved;}catch(e){}
+  setView(start);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camden Food Mission — Outcomes Wheel</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --paper:#F4EFE4;--paper2:#EDE7D8;--ink:#221F18;--ink2:#4A4536;--muted:#8B8369;--line:rgba(60,52,32,.14);
+    --equality:#4499B0;--health:#C07860;--environment:#8AB834;--preparedness:#6BA876;--economic:#B8882E;
+    --serif:'Palatino Linotype',Palatino,Georgia,serif;--sans:'Segoe UI',system-ui,sans-serif;--mono:'Consolas',monospace;
+  }
+  html,body{height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5}
+  .wrap{max-width:1240px;margin:0 auto;padding:34px 30px 60px}
+  .kick{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,4.5vw,46px);line-height:1.02;letter-spacing:-.01em;margin:8px 0 8px;text-wrap:balance}
+  .sub{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink2);max-width:70ch;margin-bottom:26px}
+
+  .layout{display:grid;grid-template-columns:1.35fr 1fr;gap:30px;align-items:start}
+  .wheelbox{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:14px;position:relative}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+
+  .panel{display:flex;flex-direction:column;gap:20px}
+  .card{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .card h3{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
+  /* availability summary */
+  .avail-bar{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin-bottom:12px}
+  .avail-bar div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:#fff}
+  .avail-legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--ink2)}
+  .avail-legend .al{display:inline-flex;align-items:center;gap:6px}
+  .avail-legend .sw{width:11px;height:11px;border-radius:2px}
+  .avail-hero{font-family:var(--serif);font-size:15px;line-height:1.5;color:var(--ink2);margin-top:14px}
+  .avail-hero b{color:var(--ink);font-weight:700}
+
+  /* correspondence */
+  .corr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .corr-row:last-child{border-bottom:0}
+  .corr-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+  .corr-dot.empty{background:none;border:1.5px dashed var(--muted)}
+  .corr-name{flex:1;color:var(--ink2)}
+  .corr-name.miss{color:var(--muted);font-style:italic}
+  .corr-tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:3px}
+  .corr-tag.miss{color:#B4553C;border-color:rgba(180,85,60,.4)}
+
+  .revealnote{background:linear-gradient(180deg,rgba(107,168,118,.10),transparent);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+  .revealnote p{font-family:var(--serif);font-size:15px;line-height:1.55;color:var(--ink2)}
+  .revealnote a{color:var(--economic);font-weight:600;text-decoration:none;border-bottom:1px solid transparent}
+  .revealnote a:hover{border-bottom-color:var(--economic)}
+
+  /* tooltip */
+  #tip{position:fixed;z-index:50;max-width:300px;background:#1a1712;color:#EDE6D6;border:1px solid #3a3428;border-radius:9px;padding:11px 13px;font-size:12px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.4);display:none;pointer-events:none}
+  #tip .tt-out{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;font-weight:700}
+  #tip .tt-sig{font-weight:600;margin-bottom:4px}
+  #tip .tt-av{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;padding:2px 6px;border-radius:3px;display:inline-block}
+  .dot{cursor:pointer;transition:opacity .12s}
+  #status{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:40px 0;text-align:center}
+
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">Camden Food Mission · Collective Intelligence</div>
+  <h1>What Camden measures</h1>
+  <div class="sub">The mission's own outcomes framework — four long-term outcomes, their signals, and the metrics beneath them. Coloured by the goal each maps to; each dot shows whether the data actually exists yet.</div>
+
+  <div id="status">Loading Camden outcomes from Notion…</div>
+
+  <div class="layout" id="layout" style="display:none">
+    <div class="wheelbox">
+      <svg id="wheel" viewBox="0 0 640 640"></svg>
+    </div>
+
+    <div class="panel">
+      <div class="card">
+        <h3>Can we actually measure it?</h3>
+        <div class="avail-bar" id="avail-bar"></div>
+        <div class="avail-legend">
+          <span class="al"><span class="sw" style="background:#5E9A6B"></span>Yes — measurable now</span>
+          <span class="al"><span class="sw" style="background:#C9A24B"></span>Proxy</span>
+          <span class="al"><span class="sw" style="background:#7E8AA0"></span>UK / London only</span>
+          <span class="al"><span class="sw" style="background:#C7BFAC"></span>No — not yet</span>
+        </div>
+        <div class="avail-hero" id="avail-hero"></div>
+      </div>
+
+      <div class="card">
+        <h3>Where this sits in the full food system</h3>
+        <div id="corr-dims"></div>
+        <div style="height:14px"></div>
+        <h3 style="margin-bottom:10px">Value chain covered</h3>
+        <div id="corr-sectors"></div>
+      </div>
+
+      <div class="revealnote">
+        <p>Camden measures the <b>consumption end</b> of the food system — access, diet, choice, waste. The <b>inputs, production and processing</b> that feed it, and the <b>economics</b> that price it, sit outside this view. That gap is exactly where <a href="sovereign-food-system.html">the fuller wheel →</a> — and the pathways Beyond&nbsp;Camden and Beyond&nbsp;Price — begin.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+var WORKER='https://camden-notion-proxy.aleks-208.workers.dev/databases';
+
+// Outcome → our-dimension mapping (per Camden's own framing)
+var DIM={equality:{lbl:'Equity & Fairness',c:'#4499B0'},health:{lbl:'Health',c:'#C07860'},
+  environment:{lbl:'Environment',c:'#8AB834'},preparedness:{lbl:'Preparedness',c:'#6BA876'},economic:{lbl:'Economic',c:'#B8882E'}};
+function outcomeDim(o){
+  o=(o||'').toLowerCase();
+  if(/crisis|food secure/.test(o))return 'equality';
+  if(/healthy|balanced diet/.test(o))return 'health';
+  if(/children|flourish/.test(o))return 'equality';
+  if(/climate|environment/.test(o))return 'environment';
+  return 'equality';
+}
+function availColor(a){
+  a=(a||'').toLowerCase();
+  if(/yes/.test(a))return '#5E9A6B';
+  if(/proxy/.test(a))return '#C9A24B';
+  if(/uk|london/.test(a))return '#7E8AA0';
+  return '#C7BFAC'; // No / blank
+}
+function availLabel(a){a=(a||'').trim();return a?a:'No';}
+
+// Snapshot of the 48 Camden outcome-metrics (from the Notion "Missions Outcomes Repository").
+// Embedded for instant render; regenerate from the Worker /databases if the repository changes.
+var SNAPSHOT=[{"no":"A.2","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"Reduced food waste in the borough","measure":"Edible food waste perweek by food businesses","avail":"Proxy"},{"no":"A.5","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"","measure":"Number of hours taught healthy cooking at schools","avail":"No"},{"no":"C.3","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"","measure":"Increase No. of residents who are members of a food coop","avail":""},{"no":"C.1","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Reduction in number of emergency food parcels distributed to people in crisis","measure":"Number of emergency food parcels given by food banks in the Trussel Community","avail":"Proxy"},{"no":"A.3","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"","measure":"Number of businesses that sign on to the food buying standards","avail":"No"},{"no":"D.1","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"","measure":"Increase number of Coops in Camden","avail":"Yes"},{"no":"A.4","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"","measure":"Space to demand ratio for food growing in the borough","avail":"No"},{"no":"A.8","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"","measure":"Take up of breastfeeding support across demographics","avail":"No"},{"no":"B.6","outcome":"Residents eat a healthy and balanced diet","signal":"","measure":"Number of advertising policy compliant ads in Camden","avail":"No"},{"no":"C.2","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Reduction in share of household expenditure on food across income levels","measure":"household expenditure on food & non-alcoholic drinks as a percentage of total expenditure","avail":"For UK"},{"no":"A.7","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"","measure":"Number of enrolments and completions or sessions","avail":"No"},{"no":"B.1","outcome":"Residents eat a healthy and balanced diet","signal":"","measure":"Lower rates of food-related long term health conditions","avail":"No"},{"no":"B.5","outcome":"Residents eat a healthy and balanced diet","signal":"","measure":"Number of businesses that sign on to the healthy catering committment","avail":"No"},{"no":"B.3","outcome":"Residents eat a healthy and balanced diet","signal":"","measure":"Increased understanding of food growing practices","avail":"No"},{"no":"D.3","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"","measure":"Increase of the average income of those accessing income max support v. baseline","avail":""},{"no":"A.6","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"","measure":"Take up of FSM","avail":"No"},{"no":"C.4","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"","measure":"Increase No. of residents interested in joining a food coop","avail":"Yes"},{"no":"A.1","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"","measure":"No of residents accessing income max support","avail":"Yes"},{"no":"B.4","outcome":"Residents eat a healthy and balanced diet","signal":"","measure":"Uptake of healthy eating/cooking services","avail":"No"},{"no":"D.2","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"","measure":"Increase No. of Camden Businesses signed up to living wage","avail":""},{"no":"B.2","outcome":"Residents eat a healthy and balanced diet","signal":"","measure":"Self-reported satisfaction levels with Camden food provision","avail":"No"},{"no":"1.10","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"Improved confidence and knowledge of residents about food and nutrition","measure":"Increased understanding of nutrition","avail":"No"},{"no":"3.7","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Reduced dependency on crisis food provision","measure":"Fewer repeat users of emergency food services over time","avail":"No"},{"no":"1.1","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Residents have access to food choices in their borough","measure":"Number of Choice based food support v. crisis based","avail":"No"},{"no":"1.3","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"Reduced air miles of food consumed in the borough","measure":"Per capita emissions of London boroughs by final product","avail":"Yes"},{"no":"1.8","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"Lower obesity rate in childhood","measure":"% children who are overweight or obese in Reception and Year 6","avail":"Yes"},{"no":"3.5","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Increase in % of food secure households in Camden","measure":"Household food security status by region/country","avail":"For Inner London"},{"no":"2.3","outcome":"Residents eat a healthy and balanced diet","signal":"Lower obesity rate","measure":"Share of adults and children who are overweight or obese","avail":"Yes"},{"no":"4.1","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Community food projects continue to innovate","measure":"","avail":"No"},{"no":"4.2","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Residents are satisfied with the choices available to them","measure":"Reported satisfaction with the food options available","avail":"No"},{"no":"3.4","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Reduced dependency on crisis food provision","measure":"Household food bank usage by region/country","avail":"For Inner London"},{"no":"1.6","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"Improved % of food procurement meets the sustainable food standards","measure":"% of procured food that meets the sustainable food standards","avail":"No"},{"no":"1.2","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"Reduced food waste in the borough","measure":"Per capita household waste","avail":"Proxy"},{"no":"4.3","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Improved affordability of food for low-income households","measure":"Rate of change of disposable income vs food prices","avail":"For UK"},{"no":"2.5","outcome":"Residents eat a healthy and balanced diet","signal":"Improved % of residents who meet 5-a-day guidelines","measure":"Percentage of adults who meet the 5-a-day guidelines in Camden","avail":"Yes"},{"no":"3.2","outcome":"Residents eat a healthy and balanced diet","signal":"Uptake of food growing across demographic groups","measure":"%age of local residents involved in food growing","avail":"No"},{"no":"1.4","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"More surplus food circulated through redistribution channels","measure":"Amount of food waste redistributed through existing channels","avail":"No"},{"no":"3.6","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Choice-based food models are financially sustainable over time","measure":"","avail":"No"},{"no":"3.1","outcome":"Residents eat a healthy and balanced diet","signal":"Increase in number of healthy food options in the borough","measure":"Number of healthy food providers over the years","avail":"No"},{"no":"1.7","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"Higher % of children eat fresh fruit / vegetables on most days","measure":"Percentage of primary students had 5 or more portions","avail":"Yes"},{"no":"1.5","outcome":"Camden’s food system contributes to tackling the climate crisis","signal":"Improved % of sustainable food options in average food basket","measure":"Change in composition of household purchase of food and drink","avail":"No"},{"no":"2.4","outcome":"Residents eat a healthy and balanced diet","signal":"Improved nutrition of household consumption","measure":"Self-reported confidence levels in cooking healthy meals","avail":"No"},{"no":"2.6","outcome":"Residents eat a healthy and balanced diet","signal":"Average food consumption is healthier and more balanced","measure":"Food consumption habits in the borough","avail":"No"},{"no":"4.5","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Residents are enabled to make their own food choices","measure":"Number of residents interested in joining a choice based food support","avail":"No"},{"no":"2.2","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"Improved confidence and knowledge of young people about food","measure":"Self-reported food literacy","avail":"No"},{"no":"2.1","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"Improved nutrition in early childhood","measure":"6-8 weeks breastfeeding","avail":"Yes"},{"no":"4.4","outcome":"Residents are food secure, and don’t need to access crisis food provision","signal":"Reduced dependency on crisis food provision","measure":"Number or percentage of households needing crisis food provision","avail":"No"},{"no":"1.9","outcome":"Food is a foundation of children’s and young people’s flourishing lives","signal":"Improved nutrition of household consumption","measure":"Self-reported increase in cooking","avail":""}];
+render(SNAPSHOT);
+
+function render(rows){
+  document.getElementById('status').style.display='none';
+  document.getElementById('layout').style.display='grid';
+
+  // group by outcome, ordered by size
+  var groups={};
+  rows.forEach(function(r){(groups[r.outcome]=groups[r.outcome]||[]).push(r);});
+  var outcomes=Object.keys(groups).sort(function(a,b){return groups[b].length-groups[a].length;});
+
+  // ── availability summary ──
+  var av={yes:0,proxy:0,region:0,no:0};
+  rows.forEach(function(r){var a=r.avail.toLowerCase();
+    if(/yes/.test(a))av.yes++;else if(/proxy/.test(a))av.proxy++;else if(/uk|london/.test(a))av.region++;else av.no++;});
+  var tot=rows.length;
+  var bar=document.getElementById('avail-bar');
+  [['#5E9A6B',av.yes],['#C9A24B',av.proxy],['#7E8AA0',av.region],['#C7BFAC',av.no]].forEach(function(p){
+    if(!p[1])return;var d=document.createElement('div');d.style.background=p[0];d.style.flex=p[1];
+    d.textContent=p[1];bar.appendChild(d);});
+  document.getElementById('avail-hero').innerHTML='Only <b>'+av.yes+' of '+tot+'</b> metrics can be measured today. The framework is <b>'+Math.round((tot-av.yes)/tot*100)+'% aspirational</b> — Camden has named what it wants to know, but the data mostly doesn\'t exist yet.';
+
+  // ── the wheel ──
+  var svg=document.getElementById('wheel'),cx=320,cy=320,inner=64,outer=280;
+  var GAP=0.06, n=outcomes.length, s='';
+  var tip=document.getElementById('tip');
+  var dimsCovered={}, sectorsCovered={D:true}; // Camden = consumption (D)
+
+  outcomes.forEach(function(oc,i){
+    var items=groups[oc];
+    var dimKey=outcomeDim(oc); dimsCovered[dimKey]=true;
+    var col=DIM[dimKey].c;
+    var a0=-Math.PI/2 + i*(2*Math.PI/n) + GAP/2;
+    var a1=-Math.PI/2 + (i+1)*(2*Math.PI/n) - GAP/2;
+    var mid=(a0+a1)/2;
+    // sector band
+    s+='<path d="'+annular(cx,cy,inner,outer,a0,a1)+'" fill="'+hexa(col,0.10)+'" stroke="'+hexa(col,0.35)+'" stroke-width="1"/>';
+    // outcome label (curved-ish: place at outer mid)
+    var lx=cx+Math.cos(mid)*(outer+24), ly=cy+Math.sin(mid)*(outer+24);
+    var anchor=Math.cos(mid)>0.2?'start':(Math.cos(mid)<-0.2?'end':'middle');
+    var words=wrap(oc,26);
+    s+='<text x="'+lx+'" y="'+(ly-(words.length-1)*7)+'" text-anchor="'+anchor+'" font-family="Palatino Linotype,Georgia,serif" font-size="12.5" font-weight="700" fill="'+col+'">';
+    words.forEach(function(w,k){s+='<tspan x="'+lx+'" dy="'+(k?14:0)+'">'+esc(w)+'</tspan>';});
+    s+='</text>';
+    s+='<text x="'+lx+'" y="'+(ly+words.length*14-6)+'" text-anchor="'+anchor+'" font-family="Consolas,monospace" font-size="9" fill="'+DIM[dimKey].c+'" opacity="0.7">'+DIM[dimKey].lbl.toUpperCase()+' · CONSUMPTION</text>';
+    // dots: distribute across arc-rows within the band
+    var rows2=Math.ceil(items.length/6), per=Math.ceil(items.length/rows2);
+    items.forEach(function(it,j){
+      var rr=Math.floor(j/per), cc=j%per, rowN=Math.min(per,items.length-rr*per);
+      var rad=inner+30+ (rows2>1?rr*((outer-inner-50)/(rows2-1||1)):(outer-inner-50)/2);
+      var t=rowN>1?(cc/(rowN-1)):0.5;
+      var ang=a0+0.10+t*((a1-a0)-0.20);
+      var x=cx+Math.cos(ang)*rad, y=cy+Math.sin(ang)*rad;
+      var ac=availColor(it.avail), yes=/yes/i.test(it.avail);
+      var fill=yes?ac:'none', stroke=ac;
+      s+='<circle class="dot" cx="'+x+'" cy="'+y+'" r="5.5" fill="'+(yes?ac:hexa(ac,0.18))+'" stroke="'+ac+'" stroke-width="'+(yes?0:1.6)+'" '
+        +'data-o="'+esc(oc)+'" data-s="'+esc(it.signal||it.measure||'—')+'" data-a="'+esc(availLabel(it.avail))+'" data-c="'+col+'"/>';
+    });
+  });
+  // center
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+inner+'" fill="#F4EFE4" stroke="'+hexa('#8B8369',0.4)+'"/>';
+  s+='<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" font-family="Palatino Linotype,Georgia,serif" font-size="14" font-weight="700" fill="#221F18">Camden</text>';
+  s+='<text x="'+cx+'" y="'+(cy+11)+'" text-anchor="middle" font-family="Palatino Linotype,Georgia,serif" font-size="14" font-weight="700" font-style="italic" fill="#4A4536">Food Mission</text>';
+  svg.innerHTML=s;
+
+  // dot tooltips
+  svg.querySelectorAll('.dot').forEach(function(el){
+    el.addEventListener('mouseenter',function(e){
+      var a=el.getAttribute('data-a');
+      tip.innerHTML='<div class="tt-out" style="color:'+el.getAttribute('data-c')+'">'+el.getAttribute('data-o')+'</div>'
+        +'<div class="tt-sig">'+el.getAttribute('data-s')+'</div>'
+        +'<span class="tt-av" style="background:'+availColor(a)+';color:#0d0d08">'+a+'</span>';
+      tip.style.display='block';
+    });
+    el.addEventListener('mousemove',function(e){tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px';});
+    el.addEventListener('mouseleave',function(){tip.style.display='none';});
+  });
+
+  // ── correspondence panel ──
+  var allDims=['equality','health','environment','preparedness','economic'];
+  var cd=document.getElementById('corr-dims');
+  allDims.forEach(function(dk){
+    var covered=!!dimsCovered[dk];
+    cd.innerHTML+='<div class="corr-row"><span class="corr-dot'+(covered?'':' empty')+'" style="background:'+(covered?DIM[dk].c:'none')+'"></span>'
+      +'<span class="corr-name'+(covered?'':' miss')+'">'+DIM[dk].lbl+'</span>'
+      +'<span class="corr-tag'+(covered?'':' miss')+'">'+(covered?'covered':'not measured')+'</span></div>';
+  });
+  var sectors=[['D','Consumption',true],['C','Processing & Distribution','partial'],['B','Production',false],['A','Inputs',false]];
+  var cs=document.getElementById('corr-sectors');
+  sectors.forEach(function(sc){
+    var cov=sc[2];
+    var label=cov===true?'covered':(cov==='partial'?'a little':'not measured');
+    var miss=cov!==true;
+    cs.innerHTML+='<div class="corr-row"><span class="corr-dot'+(cov===true?'':' empty')+'" style="background:'+(cov===true?'#8B8369':'none')+'"></span>'
+      +'<span class="corr-name'+(miss?' miss':'')+'">'+sc[0]+' · '+sc[1]+'</span>'
+      +'<span class="corr-tag'+(cov===false?' miss':'')+'">'+label+'</span></div>';
+  });
+}
+
+// ── helpers ──
+function annular(cx,cy,ri,ro,a0,a1){
+  var x0=cx+Math.cos(a0)*ro,y0=cy+Math.sin(a0)*ro,x1=cx+Math.cos(a1)*ro,y1=cy+Math.sin(a1)*ro;
+  var x2=cx+Math.cos(a1)*ri,y2=cy+Math.sin(a1)*ri,x3=cx+Math.cos(a0)*ri,y3=cy+Math.sin(a0)*ri;
+  var laf=(a1-a0)>Math.PI?1:0;
+  return 'M'+x0+' '+y0+' A'+ro+' '+ro+' 0 '+laf+' 1 '+x1+' '+y1+' L'+x2+' '+y2+' A'+ri+' '+ri+' 0 '+laf+' 0 '+x3+' '+y3+' Z';
+}
+function hexa(h,a){var n=parseInt(h.slice(1),16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+function wrap(t,max){var w=t.split(' '),lines=[],cur='';w.forEach(function(x){if((cur+' '+x).trim().length>max){lines.push(cur.trim());cur=x;}else cur+=' '+x;});if(cur.trim())lines.push(cur.trim());return lines;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
