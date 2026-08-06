@@ -2,65 +2,181 @@
 <html>
 <head>
 <style>
-  body { font-family: Inter, sans-serif; font-size: 12px; margin: 0; padding: 16px; background: #fff; color: #1a1a1a; }
-  h3 { margin: 0 0 8px; font-size: 14px; font-weight: 600; }
-  p { margin: 0 0 12px; color: #666; line-height: 1.5; }
-  button { width: 100%; padding: 10px; background: #18a0fb; border: none; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 4px; }
-  button:hover { background: #0d8de0; }
-  button:disabled { background: #bbb; cursor: not-allowed; }
-  #status { margin-top: 12px; padding: 8px 10px; border-radius: 4px; font-size: 11px; display: none; }
-  #status.info  { background: #e8f4fd; color: #0d6ea0; display: block; }
-  #status.ok    { background: #e6f4ea; color: #1e7e34; display: block; }
+  :root { --acc:#4F8A5B; }
+  * { box-sizing: border-box; }
+  body { font-family: 'DM Sans', Inter, sans-serif; font-size: 12px; margin: 0; padding: 0; background: #fff; color: #1a1a1a; display: flex; flex-direction: column; height: 100vh; }
+  header { padding: 13px 16px 9px; border-bottom: 1px solid #ececec; }
+  h3 { margin: 0 0 3px; font-size: 14px; font-weight: 700; }
+  header p { margin: 0; color: #777; font-size: 11px; line-height: 1.4; }
+  .bar { display: flex; gap: 8px; align-items: center; padding: 8px 16px; border-bottom: 1px solid #f0f0f0; }
+  .bar .grow { flex: 1; color:#666; }
+  .link { color: var(--acc); cursor: pointer; font-weight: 600; font-size: 11px; }
+  .link:hover { text-decoration: underline; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px 16px; border-bottom: 1px solid #f0f0f0; align-items: center; }
+  .chips .lbl { font-size: 10px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-right: 2px; }
+  .chip { font-size: 10.5px; padding: 3px 9px; border-radius: 14px; cursor: pointer; border: 1px solid #d5d5cf; background: #fff; color: #666; user-select: none; }
+  .chip.on { color: #fff; border-color: transparent; font-weight: 600; }
+  #list { flex: 1; overflow-y: auto; padding: 4px 10px 10px; }
+  .grp-h { display: flex; align-items: center; gap: 7px; margin: 11px 4px 3px; font-weight: 700; font-size: 11px; }
+  .grp-h .sw { width: 9px; height: 9px; border-radius: 50%; }
+  .grp-h .n { color: #999; font-weight: 500; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 5px; cursor: pointer; }
+  .row:hover { background: #f5f7f4; }
+  .row .t { flex: 1; font-size: 11.5px; line-height: 1.3; }
+  .row .tag { font-size: 8.5px; padding: 1px 6px; border-radius: 9px; color: #fff; white-space: nowrap; }
+  input[type=checkbox] { accent-color: var(--acc); width: 14px; height: 14px; cursor: pointer; }
+  footer { padding: 11px 16px; border-top: 1px solid #ececec; }
+  button { width: 100%; padding: 11px; background: var(--acc); border: none; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 6px; }
+  button:hover { background: #3B6B45; } button:disabled { background: #bbb; cursor: not-allowed; }
+  button.secondary { background: #fff; color: var(--acc); border: 1px solid var(--acc); margin-top: 8px; }
+  button.secondary:hover { background: #f1f7f2; }
+  button.secondary:disabled { background: #fff; color: #c3c3c3; border-color: #e0e0e0; }
+  .lastup { margin-top: 8px; font-size: 10.5px; color: #9a9a9a; text-align: center; }
+  #status { margin-top: 9px; padding: 8px 10px; border-radius: 5px; font-size: 11px; display: none; line-height: 1.45; white-space: pre-wrap; }
+  #status.info { background: #eef4ee; color: #2c5a34; display: block; }
+  #status.ok { background: #e6f4ea; color: #1e7e34; display: block; }
   #status.error { background: #fdecea; color: #c0392b; display: block; }
-  .count { font-size: 11px; color: #888; margin-top: 4px; }
+  .empty { color: #999; text-align: center; padding: 30px 10px; font-size: 11px; }
 </style>
 </head>
 <body>
-<h3>Camden Cards — Notion Sync</h3>
-<p>Fetches all intervention cards from Notion and populates copies of your card template on the canvas.</p>
-<button id="btn">Sync cards from Notion</button>
-<div id="status"></div>
+<header>
+  <h3>Camden Food Portfolio — Cards</h3>
+  <p>Filter by the <b>revised</b> column, then generate. Default: <b>Yes</b> + <b>CB</b>.</p>
+</header>
+<div class="bar">
+  <span class="grow" id="loadedInfo">Loading…</span>
+  <span class="link" id="reload">Reload</span>
+  <span class="link" id="selAll">All</span>
+  <span class="link" id="selNone">None</span>
+</div>
+<div class="chips" id="chips"></div>
+<div id="list"><div class="empty">Loading portfolio…</div></div>
+<footer>
+  <button id="gen" disabled>Generate cards</button>
+  <button id="upd" class="secondary">↻ Update cards on canvas</button>
+  <div id="lastup" class="lastup">Last updated: never</div>
+  <div id="status"></div>
+</footer>
 
 <script>
-  const WORKER = 'https://camden-notion-proxy.aleks-208.workers.dev/cards';
+  var WORKER = 'https://camden-notion-proxy.aleks-208.workers.dev/portfolio-final';
+  var PW_META = { I: { name: 'I · Beyond Crisis', c: '#B07D2B' }, II: { name: 'II · Beyond Camden', c: '#4F8A5B' }, III: { name: 'III · Beyond Health', c: '#7C5DA6' } };
+  var REV_COLOR = { 'Yes': '#4F8A5B', 'CB': '#5E4A2A', 'Do not include': '#C0392B', 'Org': '#3A6EA5', 'Hmm': '#B07D2B', '(blank)': '#9A9A8E' };
+  var cards = [], checked = {};
 
-  document.getElementById('btn').onclick = async () => {
-    const btn = document.getElementById('btn');
-    const st  = document.getElementById('status');
-    btn.disabled = true;
-    st.className = 'info';
-    st.textContent = 'Fetching cards from Notion…';
+  var $ = function (id) { return document.getElementById(id); };
+  function st(cls, txt) { var s = $('status'); s.className = cls; s.textContent = txt; }
+  function pwKey(c) { var m = String(c.pathway || '').trim().match(/^(III|II|I)\b/); return m ? m[1] : 'I'; }
+  function revOf(c) { return (c.revised || '').trim() || '(blank)'; }
+  function revColor(v) { return REV_COLOR[v] || '#9A9A8E'; }
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function isDefault(c) { var r = revOf(c).toLowerCase(); return r === 'yes' || r === 'cb'; }
+  function count() { return Object.keys(checked).filter(function (k) { return checked[k]; }).length; }
+  function updateBtn() { var n = count(); var b = $('gen'); b.disabled = n === 0; b.textContent = n ? 'Generate ' + n + ' card' + (n > 1 ? 's' : '') : 'Generate cards'; }
 
-    try {
-      const res   = await fetch(WORKER);
-      const cards = await res.json();
-      if (!Array.isArray(cards)) throw new Error(cards.error || 'Unexpected response');
-      st.textContent = `Got ${cards.length} cards — building frames…`;
-      parent.postMessage({ pluginMessage: { type: 'sync', cards } }, '*');
-    } catch (e) {
-      st.className = 'error';
-      st.textContent = 'Fetch failed: ' + e.message;
-      btn.disabled = false;
-    }
+  function distinctRevised() {
+    var seen = {}, order = [];
+    cards.forEach(function (c) { var v = revOf(c); if (!seen[v]) { seen[v] = 1; order.push(v); } });
+    // stable, sensible order
+    var pref = ['Yes', 'CB', 'Org', 'Hmm', '(blank)', 'Do not include'];
+    order.sort(function (a, b) { var ia = pref.indexOf(a), ib = pref.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+    return order;
+  }
+  function groupIdx(v) { return cards.map(function (c, i) { return { c: c, i: i }; }).filter(function (x) { return revOf(x.c) === v; }).map(function (x) { return x.i; }); }
+
+  function renderChips() {
+    var box = $('chips'); box.innerHTML = '<span class="lbl">Include</span>';
+    distinctRevised().forEach(function (v) {
+      var idx = groupIdx(v), on = idx.length && idx.every(function (i) { return checked[i]; });
+      var chip = document.createElement('span');
+      chip.className = 'chip' + (on ? ' on' : '');
+      chip.style.background = on ? revColor(v) : '#fff';
+      chip.textContent = v + ' · ' + idx.length;
+      chip.onclick = function () { var target = !on; idx.forEach(function (i) { checked[i] = target; }); renderAll(); };
+      box.appendChild(chip);
+    });
+  }
+
+  function renderList() {
+    var list = $('list'); list.innerHTML = '';
+    ['I', 'II', 'III'].forEach(function (pk) {
+      var items = cards.map(function (c, i) { return { c: c, i: i }; }).filter(function (x) { return pwKey(x.c) === pk; });
+      if (!items.length) return;
+      var meta = PW_META[pk];
+      var h = document.createElement('div'); h.className = 'grp-h';
+      var allOn = items.every(function (x) { return checked[x.i]; });
+      h.innerHTML = '<input type="checkbox" ' + (allOn ? 'checked' : '') + '><span class="sw" style="background:' + meta.c + '"></span>' + meta.name + ' <span class="n">' + items.length + '</span>';
+      h.querySelector('input').onclick = function (e) { e.stopPropagation(); var on = e.target.checked; items.forEach(function (x) { checked[x.i] = on; }); renderAll(); };
+      list.appendChild(h);
+      items.forEach(function (x) {
+        var v = revOf(x.c);
+        var r = document.createElement('div'); r.className = 'row';
+        r.innerHTML = '<input type="checkbox" ' + (checked[x.i] ? 'checked' : '') + '><span class="t">' + esc(x.c.title || '(untitled)') + '</span><span class="tag" style="background:' + revColor(v) + '">' + esc(v) + '</span>';
+        var cb = r.querySelector('input');
+        r.onclick = function (e) { if (e.target !== cb) cb.checked = !cb.checked; checked[x.i] = cb.checked; renderChips(); updateBtn(); };
+        list.appendChild(r);
+      });
+    });
+  }
+  function renderAll() { renderChips(); renderList(); updateBtn(); }
+
+  function load() {
+    st('info', 'Fetching portfolio…');
+    fetch(WORKER).then(function (r) { return r.json(); }).then(function (d) {
+      if (!Array.isArray(d)) throw new Error(d.error || 'Unexpected response');
+      cards = d; checked = {}; cards.forEach(function (c, i) { checked[i] = isDefault(c); });
+      $('loadedInfo').textContent = cards.length + ' cards';
+      renderAll(); $('status').style.display = 'none';
+    }).catch(function (e) { st('error', 'Fetch failed: ' + e.message); });
+  }
+  $('reload').onclick = load;
+  $('selAll').onclick = function () { cards.forEach(function (_, i) { checked[i] = true; }); renderAll(); };
+  $('selNone').onclick = function () { checked = {}; renderAll(); };
+
+  $('gen').onclick = function () {
+    var sel = cards.filter(function (_, i) { return checked[i]; });
+    if (!sel.length) return;
+    $('gen').disabled = true; st('info', 'Building ' + sel.length + ' cards…');
+    parent.postMessage({ pluginMessage: { type: 'sync', cards: sel } }, '*');
   };
 
-  window.onmessage = (e) => {
-    const msg = e.data.pluginMessage;
-    if (!msg) return;
-    const st = document.getElementById('status');
-    if (msg.type === 'done') {
-      st.className = 'ok';
-      st.textContent = msg.text;
-      document.getElementById('btn').disabled = false;
-    } else if (msg.type === 'error') {
-      st.className = 'error';
-      st.textContent = msg.text;
-      document.getElementById('btn').disabled = false;
-    } else if (msg.type === 'progress') {
-      st.className = 'info';
-      st.textContent = msg.text;
-    }
+  // ── update existing canvas cards from latest Notion data ──
+  var lastUpdatedMs = 0;
+  function relTime(ms) {
+    if (!ms) return 'never';
+    var s = Math.floor((Date.now() - ms) / 1000);
+    if (s < 45) return 'just now';
+    var m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+    var h = Math.floor(m / 60); if (h < 24) return h + ' hr ago';
+    return Math.floor(h / 24) + ' d ago';
+  }
+  function renderLast() { $('lastup').textContent = 'Last updated: ' + relTime(lastUpdatedMs); }
+  setInterval(renderLast, 30000);
+
+  $('upd').onclick = function () {
+    var b = this; b.disabled = true; st('info', 'Fetching latest…');
+    fetch(WORKER).then(function (r) { return r.json(); }).then(function (d) {
+      if (!Array.isArray(d)) throw new Error(d.error || 'Unexpected response');
+      cards = d; checked = {}; cards.forEach(function (c, i) { checked[i] = isDefault(c); });
+      $('loadedInfo').textContent = cards.length + ' cards'; renderAll();
+      st('info', 'Updating cards on canvas…');
+      parent.postMessage({ pluginMessage: { type: 'update', cards: d } }, '*');
+    }).catch(function (e) { st('error', 'Update fetch failed: ' + e.message); b.disabled = false; });
   };
+
+  window.onmessage = function (e) {
+    var msg = e.data.pluginMessage; if (!msg) return;
+    if (msg.type === 'done') { st('ok', msg.text); lastUpdatedMs = msg.ts || Date.now(); renderLast(); updateBtn(); }
+    else if (msg.type === 'updated') { st('ok', msg.text); lastUpdatedMs = msg.ts || Date.now(); renderLast(); $('upd').disabled = false; }
+    else if (msg.type === 'meta') { lastUpdatedMs = msg.ts || 0; renderLast(); }
+    else if (msg.type === 'error') { st('error', msg.text); updateBtn(); $('upd').disabled = false; }
+    else if (msg.type === 'progress') { st('info', msg.text); }
+  };
+
+  renderLast();
+  parent.postMessage({ pluginMessage: { type: 'ready' } }, '*');
+  load();
 </script>
 </body>
 </html>

@@ -10,6 +10,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="stats-data.js"></script>
+<script src="school-data.js"></script>
+<script src="supply-map.js"></script>
+<script src="ports-narrative.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -262,6 +265,93 @@ body.right-collapsed .pnl-r{display:none}
 .panel-tgl.left{left:0;border-left:0;border-radius:0 7px 7px 0}
 .panel-tgl.right{right:0;border-right:0;border-radius:7px 0 0 7px}
 body.chart-open{--rw:560px}
+/* ══ School-food buying-power dock (right panel) ══ */
+body.sf-open{--rw:460px}
+#sf-dock{display:none;padding:14px 15px;border-bottom:1px solid var(--border);background:var(--surface)}
+body.sf-open #sf-dock{display:block}
+#sf-dock .sd-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+#sf-dock .sd-h1{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+#sf-dock .sd-h2{font-size:10px;color:var(--dim);margin-top:2px}
+#sf-dock .sd-close{margin-left:auto;border:1px solid var(--border);background:var(--surface2);color:var(--dim);font-size:13px;cursor:pointer;border-radius:6px;width:26px;height:26px;flex-shrink:0}
+#sf-dock .sd-close:hover{background:var(--border);color:var(--text)}
+#sf-dock .exp-chip{flex:1;font-size:10.5px;font-weight:600;padding:6px 4px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--dim);cursor:pointer}
+#sf-dock .exp-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+#sf-dock .bp-clickable{cursor:pointer}
+/* ══ Global supply-risk map ══ */
+body.gsm-active{--rw:440px}
+#supply-dock{display:none;padding:14px 15px;border-bottom:1px solid var(--border);background:var(--surface)}
+body.gsm-active #supply-dock{display:block}
+#supply-dock .sd-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+#supply-dock .sd-h1{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+#supply-dock .sd-h2{font-size:10px;color:var(--dim);margin-top:2px}
+#supply-dock .sd-close{margin-left:auto;border:1px solid var(--border);background:var(--surface2);color:var(--dim);font-size:13px;cursor:pointer;border-radius:6px;width:26px;height:26px;flex-shrink:0}
+#supply-dock .sd-close:hover{background:var(--border);color:var(--text)}
+.gsm-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:11px;margin-bottom:10px}
+.gsm-mk{color:var(--dim);text-transform:uppercase;font-size:9px;letter-spacing:.06em;padding-top:2px}
+.gsm-mv{color:var(--text);line-height:1.4}
+.gsm-badge{display:inline-block;color:#0b1420;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px}
+.gsm-conf{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.04em;margin-left:4px}
+.gsm-conf.est{background:rgba(30,158,104,.2);color:#3ec98a}
+.gsm-conf.scen{background:rgba(232,160,32,.2);color:#E8A020}
+.gsm-mech{font-size:11px;color:var(--text);line-height:1.55;margin:0 0 8px}
+.gsm-tip{color:var(--dim)}
+.gsm-sech{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:10px 0 4px}
+.gsm-chain{list-style:none;margin:0 0 6px;padding:0}
+.gsm-chain li{font-size:10.5px;color:var(--text);line-height:1.4;padding:3px 0 3px 16px;position:relative}
+.gsm-chain li::before{content:'↓';position:absolute;left:2px;color:var(--dim)}
+.gsm-chain li:first-child::before{content:'●';color:var(--accent);font-size:8px;top:5px}
+.gsm-chain li.landfall{color:var(--accent);font-weight:600}
+.gsm-source{font-size:9.5px;color:var(--dim);line-height:1.45;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.gsm-idx-group{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:10px 0 5px}
+.gsm-idx-group.ext{color:#C0504D}
+.gsm-idx-row{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:transparent;padding:5px 6px;border-radius:5px;cursor:pointer}
+.gsm-idx-row:hover,.gsm-idx-row.active{background:var(--surface2)}
+.gsm-idx-code{font-size:9px;font-weight:700;color:#0b1420;background:#E0A030;border-radius:3px;padding:2px 5px;flex-shrink:0}
+.gsm-idx-code.ext{background:#C0504D;color:#fff}
+.gsm-idx-txt{flex:1;min-width:0}
+.gsm-idx-name{display:block;font-size:11px;color:var(--text);font-weight:500;line-height:1.2}
+.gsm-idx-dep{display:block;font-size:9px;color:var(--dim);line-height:1.3}
+.gsm-idx-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* floating toolbar over the (real) map */
+#gsm-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:1000;display:none;align-items:center;gap:10px;flex-wrap:wrap;max-width:calc(100% - 24px);padding:7px 11px;border-radius:8px;border:1px solid var(--border);background:rgba(10,20,35,.92);backdrop-filter:blur(8px);box-shadow:0 6px 24px rgba(0,0,0,.5)}
+body.gsm-active #gsm-bar{display:flex}
+.gsm-bar-title{font-size:11px;font-weight:700;color:var(--text);white-space:nowrap}
+.gsm-tools{display:flex;gap:4px;flex-wrap:wrap}
+.gsm-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer}
+.gsm-chip[aria-pressed="false"]{opacity:.4}
+.gsm-chip .sw{width:9px;height:9px;border-radius:2px}
+.gsm-close{font-size:11px;font-weight:600;padding:5px 11px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer}
+.gsm-close:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.gsm-tt{background:#0b1a2b;color:#E0F0FF;border:1px solid var(--border);font-size:11px}
+/* ══ Ports & just-in-time narrative ══ */
+body.pn-active{--rw:440px}
+#pn-dock{display:none;padding:14px 15px;border-bottom:1px solid var(--border);background:var(--surface)}
+body.pn-active #pn-dock{display:block}
+#pn-dock .sd-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+#pn-dock .sd-h1{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+#pn-dock .sd-h2{font-size:10px;color:var(--dim);margin-top:2px}
+#pn-dock .sd-close{margin-left:auto;border:1px solid var(--border);background:var(--surface2);color:var(--dim);font-size:13px;cursor:pointer;border-radius:6px;width:26px;height:26px;flex-shrink:0}
+#pn-dock .sd-close:hover{background:var(--border);color:var(--text)}
+.pn-dots{display:flex;gap:4px;margin-bottom:12px}
+.pn-dot{flex:1;height:3px;border:0;padding:0;border-radius:2px;background:var(--border);cursor:pointer;transition:background .2s}
+.pn-dot.on{background:#E8804A}
+.pn-dot:hover{background:var(--dim)}
+.pn-title{font-size:15px;font-weight:700;color:var(--text);line-height:1.25;margin-bottom:7px;letter-spacing:-.01em}
+.pn-lede{font-size:11.5px;color:var(--text);line-height:1.6;margin-bottom:12px}
+.pn-statwrap{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.pn-stat{padding:8px 10px;background:var(--surface2);border-left:3px solid #E8804A;border-radius:0 4px 4px 0}
+.pn-v{font-size:19px;font-weight:700;color:#E8804A;letter-spacing:-.02em;line-height:1}
+.pn-l{font-size:10.5px;color:var(--text);line-height:1.45;margin-top:4px}
+.pn-s{font-size:9px;color:var(--dim);margin-top:3px;opacity:.75}
+.pn-body{font-size:11px;color:var(--dim);line-height:1.6;margin-bottom:12px}
+.pn-body b{color:var(--text)}
+.pn-src{display:block;font-size:9px;opacity:.7;margin-top:4px}
+.pn-nav{display:flex;gap:6px}
+.pn-btn{flex:1;font-size:11px;font-weight:600;padding:8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer}
+.pn-btn:hover:not(:disabled){background:var(--border)}
+.pn-btn.primary{background:#E8804A;border-color:#E8804A;color:#fff}
+.pn-btn.primary:hover:not(:disabled){filter:brightness(1.1)}
+.pn-btn:disabled{opacity:.35;cursor:default}
 #stats-dock{display:none;padding:14px 15px;border-bottom:1px solid var(--border);background:var(--surface)}
 body.chart-open #stats-dock{display:block}
 #stats-dock .sd-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
@@ -789,6 +879,21 @@ body.chart-open #stats-dock{display:block}
         </div>
       </div>
 
+      <!-- II-d Global dependency map -->
+      <div class="sub-sec">
+        <div class="sub-lbl2">II-d — Global Nutrition Dependency</div>
+        <div style="font-size:10px;color:var(--dim);line-height:1.5;margin-bottom:8px">Zoom out from Camden to the whole world: where the borough's calories, protein, produce and fertiliser actually originate — and the chokepoints that can break them.</div>
+        <button class="test-btn" style="width:100%;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="openSupplyMap()">🌍 Open global supply-risk map</button>
+      </div>
+
+      <!-- II-e How food physically arrives -->
+      <div class="sub-sec">
+        <div class="sub-lbl2">II-e — How Food Physically Arrives</div>
+        <div style="font-size:10px;color:var(--dim);line-height:1.5;margin-bottom:8px">A guided zoom from the world to Dover to Camden — the ports, the Short Strait chokepoint, and the just-in-time road leg that has no buffer.</div>
+        <button class="test-btn" style="width:100%;background:#E8804A;color:#fff;border-color:#E8804A;font-weight:600" onclick="openPortsNarrative()">⚓ Play: ports &amp; just-in-time →</button>
+        <div style="font-size:9px;color:var(--dim);margin-top:6px;line-height:1.4">All figures: DEFRA UK Food Security Report 2021, Theme 3.</div>
+      </div>
+
       <!-- Context charts for II -->
       <div class="sub-sec">
         <div class="sub-lbl2">Context &amp; Analysis</div>
@@ -1001,6 +1106,67 @@ body.chart-open #stats-dock{display:block}
     </div><!-- /narr3-body -->
   </div><!-- /narr3 -->
 
+  <!-- ── Narrative IV — School Food ──────────────────────────── -->
+  <div class="narr" id="narr4">
+    <div class="narr-head" onclick="toggleNarr(4)">
+      <span class="narr-num">IV</span>
+      <div>
+        <div class="narr-title">School Food</div>
+        <div class="narr-sub">The Buying Lever</div>
+      </div>
+      <span class="narr-arrow" id="narr4-arrow">▶</span>
+    </div>
+    <div class="narr-body" id="narr4-body">
+      <div class="narr-placeholder" style="font-style:normal;line-height:1.65">Camden's school-meals contract — <b style="color:var(--text)">£20.11m over 3 years</b>, ~8,000 meals a day, 40+ schools — is the single biggest, most stable food lever the borough controls. Every primary pupil eats free; secondary FSM expands Sept 2026. <b style="color:var(--text)">The question is who holds the lever, what it buys, and what it connects to.</b></div>
+
+      <!-- IV-a Where food is distributed -->
+      <div class="sub-sec">
+        <div class="sub-lbl2">IV-a — Where Food Is Distributed</div>
+        <div class="togi" onclick="togOv('schprim')">
+          <div class="togi-l"><div class="tog-dot" style="background:#e8804a;border-radius:50%"></div>
+            <div><span class="tog-name" id="togn-schprim">Primary schools</span>
+            <div style="font-size:10px;color:var(--dim)" id="schprim-count">DfE GIAS · pupils &amp; est. meal cost</div></div>
+          </div>
+          <div class="sw" id="sw-schprim"></div>
+        </div>
+        <div class="togi" onclick="togOv('schsec')">
+          <div class="togi-l"><div class="tog-dot" style="background:#9b59b6;border-radius:2px"></div>
+            <div><span class="tog-name" id="togn-schsec">Secondary schools</span>
+            <div style="font-size:10px;color:var(--dim)" id="schsec-count">FSM expands Sept 2026</div></div>
+          </div>
+          <div class="sw" id="sw-schsec"></div>
+        </div>
+        <div style="font-size:10px;color:var(--dim);line-height:1.5;margin-top:6px">Marker size ∝ pupils on roll. Popup shows roll, FSM %, and estimated annual meal spend.</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <span style="font-size:10px;color:var(--dim)">Cost / meal £</span>
+          <input type="range" id="meal-cost" min="2.5" max="6" step="0.1" value="4.47" style="flex:1;accent-color:var(--accent)" oninput="setMealCost(this.value)">
+          <span style="font-size:11px;color:var(--text);font-variant-numeric:tabular-nums" id="meal-cost-v">4.47</span>
+        </div>
+      </div>
+
+      <!-- IV-b Buying power & contract → right panel -->
+      <div class="sub-sec">
+        <div class="sub-lbl2">IV-b — Buying Power &amp; Contract</div>
+        <button class="test-btn" style="width:100%;background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600" onclick="openSF()">📊 Buying power &amp; timeline →</button>
+        <div style="font-size:10px;color:var(--dim);line-height:1.55;margin-top:8px;padding:8px;background:rgba(196,40,32,.07);border:1px solid rgba(196,40,32,.2);border-radius:4px">⚠ <b style="color:var(--text)">The missing map:</b> Caterlink publishes standards but <b style="color:var(--text)">no farm-level provenance</b>. Which farms feed Camden's kitchens is not public — mapping it is the first funded output of this vector.</div>
+      </div>
+
+      <!-- IV-c Supply network -->
+      <div class="sub-sec">
+        <div class="sub-lbl2">IV-c — Potential Supply Network</div>
+        <div class="togi" onclick="togOv('supply')">
+          <div class="togi-l"><div class="tog-dot" style="background:#2e7d46;border-radius:50%"></div>
+            <div><span class="tog-name" id="togn-supply">Aggregators, hubs &amp; growers</span>
+            <div style="font-size:10px;color:var(--dim)">Wholegood · Better Food Shed · organic farms</div></div>
+          </div>
+          <div class="sw" id="sw-supply"></div>
+        </div>
+        <div style="font-size:10px;color:var(--dim);line-height:1.5;margin-top:6px">The supply side is closer than it looks — connecting lines run to Camden's kitchens. What's missing is the contract.</div>
+      </div>
+
+    </div><!-- /narr4-body -->
+  </div><!-- /narr4 -->
+
   <!-- Data Sources -->
   <div class="sec">
     <div class="sec-lbl">Data Sources</div>
@@ -1024,6 +1190,12 @@ body.chart-open #stats-dock{display:block}
   <!-- panel collapse toggles -->
   <button id="tgl-left" class="panel-tgl left" onclick="togglePanel('left')" title="Hide/show left panel">‹</button>
   <button id="tgl-right" class="panel-tgl right" onclick="togglePanel('right')" title="Hide/show right panel">›</button>
+  <!-- Global supply-risk floating toolbar (map renders on the real Leaflet map) -->
+  <div id="gsm-bar">
+    <span class="gsm-bar-title">🌍 Global supply-risk</span>
+    <div id="gsm-tools" class="gsm-tools"></div>
+    <button class="gsm-close" onclick="closeSupplyMap()" title="Back to Camden">✕ Close</button>
+  </div>
   <!-- export composition overlays -->
   <div class="exp-title-bar" id="exp-title-bar"><div class="t" id="exp-title-out"></div><div class="s" id="exp-sub-out"></div></div>
   <div class="exp-north" id="exp-north"><svg viewBox="0 0 34 34" width="34" height="34"><polygon points="17,2 23,26 17,20 11,26" fill="#fff"/><text x="17" y="33" fill="#fff" font-size="9" font-weight="700" text-anchor="middle">N</text></svg></div>
@@ -1123,6 +1295,96 @@ body.chart-open #stats-dock{display:block}
   </div>
 </section>
 <aside class="pnl pnl-r">
+  <!-- Ports & just-in-time narrative dock -->
+  <div id="pn-dock">
+    <div class="sd-hd">
+      <div>
+        <div class="sd-h1">How food reaches Camden</div>
+        <div class="sd-h2">Ports, the Short Strait &amp; just-in-time · <span id="pn-step">1 / 6</span></div>
+      </div>
+      <button class="sd-close" onclick="closePortsNarrative()" title="Close">✕</button>
+    </div>
+    <div id="pn-dots" class="pn-dots"></div>
+    <div class="pn-title" id="pn-title"></div>
+    <div class="pn-lede" id="pn-lede"></div>
+    <div id="pn-stats" class="pn-statwrap"></div>
+    <div class="pn-body" id="pn-body"></div>
+    <div class="pn-nav">
+      <button class="pn-btn" id="pn-prev" onclick="pnPrev()">← Back</button>
+      <button class="pn-btn primary" id="pn-next" onclick="pnNext()">Next →</button>
+    </div>
+    <div class="callout-src" style="margin-top:10px;line-height:1.5"><b>Sources.</b> All port shares, tonnages, transport modes, trailer counts, HGV driver numbers and road-delay figures: <b>DEFRA, United Kingdom Food Security Report 2021, Theme 3 — Food Supply Chain Resilience</b> (Indicators 3.1.3–3.1.9). Trade-by-port and transport-mode data are for <b>2018</b>; vehicle counts <b>2020</b>; HGV drivers <b>Jul 2020–Jun 2021</b> — these are the published reference years, not current-year figures. Port locations from DfT Port Freight Statistics. Motorway corridor drawn schematically.</div>
+  </div>
+  <!-- Global supply-risk detail dock (shown when the global map is open) -->
+  <div id="supply-dock">
+    <div class="sd-hd">
+      <div>
+        <div class="sd-h1" id="sm-name">Global Nutrition Supply Risk</div>
+        <div class="sd-h2" id="sm-region">How the world feeds Camden — and where it breaks</div>
+      </div>
+      <button class="sd-close" onclick="closeSupplyMap()" title="Close">✕</button>
+    </div>
+    <div id="sm-overview">
+      <div style="font-size:11px;color:var(--dim);line-height:1.6;margin-bottom:10px">Camden grows almost none of its own food. This maps the global systems the UK — and therefore Camden — depends on for calories, protein, produce and the fertiliser behind every harvest, and the chokepoints that can disrupt them. <b style="color:var(--text)">Click any node</b> to trace its cascade to the Camden shelf.</div>
+      <div style="font-size:10px;color:var(--dim);line-height:1.5">
+        <div style="font-weight:700;color:var(--text);margin-bottom:4px">Pathways</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 12px">
+          <span><span style="color:#E0A030">●</span> Calories</span><span><span style="color:#C0504D">●</span> Protein</span><span><span style="color:#5C9E4A">●</span> Produce</span><span><span style="color:#B5651D">●</span> Inputs</span><span><span style="color:#5B8FB0">●</span> Logistics</span><span><span style="color:#8E6FB0">●</span> Climate</span>
+        </div>
+        <div style="font-weight:700;color:var(--text);margin:10px 0 4px">Status ring</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 12px">
+          <span><span style="color:#E5484D">●</span> Acute now</span><span><span style="color:#E8A020">●</span> High near-term</span><span><span style="color:#5B8FB0">●</span> On watch</span>
+        </div>
+      </div>
+      <div class="callout-src" style="margin-top:12px;line-height:1.5"><b>Data integrity:</b> a systems schematic, not a live feed. Node positions/sizes are order-of-magnitude. Structural dependencies sourced to DEFRA, FAO, USDA, USGS, World Bank, WMO. Items tagged <b style="color:#E8A020">SCENARIO</b> are illustrative, not predictions — check live ENSO status (WMO/NOAA) and commodity prices before citing.</div>
+    </div>
+    <div id="sm-detail" style="display:none">
+      <div class="gsm-meta" id="sm-meta"></div>
+      <div id="sm-mech"></div>
+    </div>
+    <div class="sub-lbl2" style="margin-top:14px">All systems</div>
+    <div id="sm-index"></div>
+  </div>
+  <!-- School-food buying power dock (shown from Narrative IV) -->
+  <div id="sf-dock">
+    <div class="sd-hd">
+      <div>
+        <div class="sd-h1">School-food buying power</div>
+        <div class="sd-h2">Camden school-meals contract · current → future</div>
+      </div>
+      <button class="sd-close" onclick="closeSF()" title="Close">✕</button>
+    </div>
+    <div class="callout-box" style="margin-bottom:12px">
+      <div style="display:flex;gap:10px">
+        <div style="flex:1"><div class="callout-val" style="font-size:17px">£20.1m</div><div class="callout-lbl">3-yr contract · ~£6.7m/yr</div></div>
+        <div style="flex:1"><div class="callout-val" style="font-size:17px">~8,000</div><div class="callout-lbl">meals/day · ~1.5m/yr</div></div>
+        <div style="flex:1"><div class="callout-val" style="font-size:17px">45%</div><div class="callout-lbl">pupils FSM-eligible</div></div>
+      </div>
+      <div class="callout-src" style="margin-top:6px">Cater Link Ltd (WSH Group) · 1 Apr 2025–31 Mar 2028 (+2 opt.) · Food for Life Silver/Gold · in-house option from Sept 2026.</div>
+    </div>
+    <div style="display:flex;gap:5px;margin-bottom:10px">
+      <button class="exp-chip active" id="bp-cur" onclick="setBPFuture(false)">Current</button>
+      <button class="exp-chip" id="bp-fut" onclick="setBPFuture(true)">＋ Future (secondary FSM)</button>
+    </div>
+    <svg id="bp-chart" viewBox="0 0 340 110" style="width:100%;display:block"></svg>
+    <div id="bp-future-ctrl" style="display:none;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--dim);white-space:nowrap">Secondary take-up</span>
+        <input type="range" id="bp-takeup" min="40" max="100" step="5" value="75" style="flex:1;accent-color:var(--accent)" oninput="setTakeup(this.value)">
+        <span style="font-size:11px;color:var(--text);font-variant-numeric:tabular-nums" id="bp-takeup-v">75%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <span style="font-size:10px;color:var(--dim);white-space:nowrap">Cost / meal £</span>
+        <input type="range" id="meal-cost2" min="2.5" max="6" step="0.1" value="4.47" style="flex:1;accent-color:var(--accent)" oninput="setMealCost(this.value)">
+        <span style="font-size:11px;color:var(--text);font-variant-numeric:tabular-nums" id="meal-cost2-v">4.47</span>
+      </div>
+    </div>
+    <div id="bp-figures" style="font-size:11px;color:var(--dim);line-height:1.55;margin-top:10px"></div>
+    <div id="bp-selected" style="display:none;font-size:11px;line-height:1.5;margin-top:10px;padding:9px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px"></div>
+    <div class="sub-lbl2" style="margin-top:14px">The Contractual Clock</div>
+    <svg id="bp-timeline" viewBox="0 0 340 96" style="width:100%;display:block"></svg>
+    <div class="callout-src" style="margin-top:6px">Contract value/dates: Contracts Finder camden001-DN728251. Future estimate = Camden secondary pupils (DfE GIAS) × take-up × £/meal × 190 days. Click any school on the map to see its share.</div>
+  </div>
   <!-- Emergency-food chart dock (shown when opened from Beyond Crisis) -->
   <div id="stats-dock">
     <div class="sd-hd">
@@ -2366,7 +2628,188 @@ async function loadSocialEnterprises(){
 ovState.osmfetch3=false;
 const pcnLayer=L.layerGroup(); ovState.pcn=false; // NHS PCN boundaries — NHS API required
 
-// Extend togOv for Narrative II+III layers
+// ── Narrative IV — School Food layers ────────────────────────────────────────
+const CAMDEN_CTR=[51.543,-0.143];
+
+// Potential supply network — aggregators/hubs (green) + growers (brown) with lines to Camden
+const supplyLayer=L.layerGroup();
+(function(){
+  // buyer node — Camden school kitchens
+  L.marker(CAMDEN_CTR,{icon:L.divIcon({className:'',html:'<div style="width:15px;height:15px;background:#111;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.6)"></div>',iconSize:[15,15],iconAnchor:[7,7]})})
+    .bindPopup('<b>Camden — the buyer</b><br>40+ school kitchens · ~8,000 meals/day<br><i>The contract (Caterlink) · £6.7m/yr</i>').addTo(supplyLayer);
+  const SUP=[
+    {n:'Wholegood',            lat:51.4795,lng:-0.1330,t:'hub', d:'New Covent Garden · organic wholesaler, direct farm relationships'},
+    {n:'Better Food Shed',     lat:51.5270,lng:-0.0170,t:'hub', d:'Bow · Growing Communities · 20t/wk from 23 farms · supplies schools'},
+    {n:'Better Food Traders',  lat:51.6050,lng:-0.3050,t:'hub', d:'12-hub regional programme · training hubs for public procurement'},
+    {n:'OrganicLea',           lat:51.6280,lng:0.0060, t:'grow',d:'Waltham Forest · market garden'},
+    {n:'Sitopia Farm',         lat:51.4870,lng:0.0700, t:'grow',d:'Greenwich · urban farm'},
+    {n:"Sarah Green's Organics",lat:51.6800,lng:0.8300,t:'grow',d:'Dengie, Essex · organic veg'},
+    {n:'Lea Valley growers',   lat:51.7000,lng:-0.0150,t:'grow',d:'Lea Valley · glasshouse horticulture'},
+  ];
+  SUP.forEach(s=>{
+    const col=s.t==='hub'?'#2e7d46':'#a9772f';
+    L.polyline([[s.lat,s.lng],CAMDEN_CTR],{color:col,weight:1.3,opacity:.35,dashArray:'4 6'}).addTo(supplyLayer);
+    L.circleMarker([s.lat,s.lng],{radius:s.t==='hub'?8:6,color:col,fillColor:col,fillOpacity:.82,weight:2})
+      .bindPopup(`<b>${s.n}</b><br>${s.d}<br><i>${s.t==='hub'?'Aggregator / hub':'Grower'}</i>`).addTo(supplyLayer);
+  });
+})();
+ovState.supply=false;
+
+// Schools — populated from window.CAMDEN_SCHOOLS (DfE GIAS) when available
+const schoolsPrimLayer=L.layerGroup(), schoolsSecLayer=L.layerGroup();
+let schoolsBuilt=false, mealCost=4.47;
+const SCHOOL_DAYS=190;
+function estCost(nor){ return Math.round(nor*SCHOOL_DAYS*mealCost); }
+function schoolPopup(s){
+  const roll=s.nor||0;
+  const cost=roll?('£'+estCost(roll).toLocaleString('en-GB')+'/yr'):'roll n/a';
+  const perHead=roll?('£'+(estCost(roll)/roll).toFixed(0)+'/pupil/yr'):'';
+  return `<b>${s.name}</b><br>${s.phase||''}${s.nor?(' · '+s.nor+' pupils'):''}${s.fsm!=null?(' · '+s.fsm+'% FSM'):''}<br>Est. meal spend: <b>${cost}</b>${perHead?(' · '+perHead):''}<br><i>Est. £${mealCost}/meal × ${SCHOOL_DAYS} days</i>`;
+}
+function markerR(nor){ return Math.max(4, Math.min(16, Math.sqrt((nor||100))/2.2)); }
+function buildSchools(){
+  if(schoolsBuilt || !window.CAMDEN_SCHOOLS) return;
+  schoolsBuilt=true;
+  let np=0,ns=0;
+  window.CAMDEN_SCHOOLS.forEach(s=>{
+    if(!s.lat||!s.lng) return;
+    const sec=/secondary|16 plus|all[- ]through/i.test(s.phase||'');
+    const col=sec?'#9b59b6':'#e8804a';
+    const m=L.circleMarker([s.lat,s.lng],{radius:markerR(s.nor),color:col,fillColor:col,fillOpacity:.7,weight:1.5}).bindPopup(schoolPopup(s));
+    m._camdenSchool=s;
+    m.on('click',()=>selectSchoolBP(s,m));
+    if(sec){ m.addTo(schoolsSecLayer); ns++; } else { m.addTo(schoolsPrimLayer); np++; }
+  });
+  const pc=document.getElementById('schprim-count'); if(pc) pc.textContent=np+' primary · DfE GIAS';
+  const sc=document.getElementById('schsec-count'); if(sc) sc.textContent=ns+' secondary · DfE GIAS';
+}
+function setMealCost(v){
+  mealCost=+v;
+  ['meal-cost','meal-cost2'].forEach(id=>{ const el=document.getElementById(id); if(el&&+el.value!==+v) el.value=v; const o=document.getElementById(id+'-v'); if(o)o.textContent=(+v).toFixed(2); });
+  // refresh open popups by rebinding
+  [schoolsPrimLayer,schoolsSecLayer].forEach(lg=>lg.eachLayer(m=>{ if(m._camdenSchool) m.setPopupContent(schoolPopup(m._camdenSchool)); }));
+  if(typeof renderBP==='function') renderBP();
+  if(selectedSchool && typeof refreshSelected==='function') refreshSelected();
+}
+ovState.schprim=false; ovState.schsec=false;
+
+// ── Buying power: current vs estimated future (secondary FSM) ─────────────────
+let bpFuture=false, bpTakeup=0.75, selectedSchool=null;
+const BP_CURRENT_YR=6.7;      // £m/yr (£20.11m ÷ 3)
+const BP_CURRENT_MEALS=8000;  // meals/day
+function secondaryPupils(){
+  if(!window.CAMDEN_SCHOOLS) return 10541;
+  return window.CAMDEN_SCHOOLS.filter(s=>/secondary|16 plus|all-through/i.test(s.phase||'')).reduce((a,s)=>a+(s.nor||0),0);
+}
+function bpFutureCalc(){
+  const sec=secondaryPupils();
+  const addMealsDay=Math.round(sec*bpTakeup);
+  const addYr=addMealsDay*190*mealCost/1e6;   // £m/yr
+  return {sec, addMealsDay, addYr, totalYr:BP_CURRENT_YR+addYr, totalMeals:BP_CURRENT_MEALS+addMealsDay};
+}
+function renderBP(){
+  const svg=document.getElementById('bp-chart'); if(!svg) return;
+  const f=bpFutureCalc();
+  const W=340,pad=8,barY=34,barH=30,axMax=16,x0=pad,axW=W-pad*2;
+  const scale=v=>axW*v/axMax;
+  const curW=scale(BP_CURRENT_YR), futW=scale(f.addYr);
+  let s='';
+  s+=`<text x="${pad}" y="14" font-size="9.5" fill="#5A82A0" letter-spacing="1">ANNUAL CONTRACT VALUE (£m/yr)</text>`;
+  [0,4,8,12,16].forEach(g=>{const gx=x0+scale(g);s+=`<line x1="${gx}" y1="24" x2="${gx}" y2="${barY+barH+4}" stroke="rgba(180,210,240,.1)"/><text x="${gx}" y="${barY+barH+16}" font-size="8" fill="#5A82A0" text-anchor="middle">${g}</text>`;});
+  s+=`<rect x="${x0}" y="${barY}" width="${curW}" height="${barH}" rx="2" fill="#1E9E68"/>`;
+  s+=`<text x="${x0+7}" y="${barY+barH/2+3.5}" font-size="11" fill="#fff" font-weight="700">£${BP_CURRENT_YR}m now</text>`;
+  if(bpFuture){
+    s+=`<rect x="${x0+curW}" y="${barY}" width="${futW}" height="${barH}" rx="2" fill="rgba(30,158,104,.38)" stroke="#1E9E68" stroke-dasharray="4 3" stroke-width="1"/>`;
+    s+=`<text x="${x0+curW+futW+5}" y="${barY+barH/2+3.5}" font-size="10" fill="#1E9E68" font-weight="700">+£${f.addYr.toFixed(1)}m</text>`;
+    s+=`<text x="${x0}" y="${barY-5}" font-size="10" fill="#1E9E68" font-weight="700">→ £${f.totalYr.toFixed(1)}m projected total</text>`;
+  }
+  // selected-school tick
+  if(selectedSchool && selectedSchool.nor){
+    const sp=estCost(selectedSchool.nor)/1e6; const tx=x0+scale(sp);
+    if(tx<=x0+axW){
+      s+=`<line x1="${tx}" y1="${barY-2}" x2="${tx}" y2="${barY+barH+2}" stroke="#F5A623" stroke-width="2"/>`;
+      s+=`<circle cx="${tx}" cy="${barY-2}" r="3" fill="#F5A623"/>`;
+      s+=`<text x="${tx}" y="${barY+barH+28}" font-size="8" fill="#F5A623" text-anchor="middle" font-weight="700">${selectedSchool.name.slice(0,18)} · £${sp.toFixed(2)}m</text>`;
+    }
+  }
+  svg.innerHTML=s;
+  // figures text
+  const fg=document.getElementById('bp-figures');
+  if(fg){
+    if(bpFuture){
+      fg.innerHTML=`Adding secondary FSM (~${f.sec.toLocaleString()} pupils · ${Math.round(bpTakeup*100)}% take-up) is <b style="color:var(--text)">+${f.addMealsDay.toLocaleString()} meals/day</b> and <b style="color:var(--text)">≈+£${f.addYr.toFixed(1)}m/yr</b> — taking the lever to <b style="color:var(--accent)">£${f.totalYr.toFixed(1)}m/yr (~${(f.totalMeals).toLocaleString()} meals/day)</b> from Sept 2026. At £${mealCost.toFixed(2)}/meal.`;
+    } else {
+      fg.innerHTML=`Now: <b style="color:var(--text)">£${BP_CURRENT_YR}m/yr</b> · ~${BP_CURRENT_MEALS.toLocaleString()} meals/day · 40+ (mostly primary) schools · £20.11m over 3 yrs.`;
+    }
+  }
+}
+function renderBPTimeline(){
+  const svg=document.getElementById('bp-timeline'); if(!svg) return;
+  const W=340, x0=16, x1=326, y=56;
+  const yrX=yr=>x0+(x1-x0)*(yr-2024.75)/(2030-2024.75);
+  let s='';
+  s+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#5A82A0" stroke-width="1"/>`;
+  [2025,2026,2027,2028,2029,2030].forEach(yr=>{const xx=yrX(yr);s+=`<line x1="${xx}" y1="${y-3}" x2="${xx}" y2="${y+3}" stroke="#5A82A0"/><text x="${xx}" y="${y+14}" font-size="7.5" fill="#5A82A0" text-anchor="middle">${yr}</text>`;});
+  // base term 2025-04 to 2028-03
+  const bx=yrX(2025.25), bxe=yrX(2028.25);
+  s+=`<rect x="${bx}" y="${y-16}" width="${bxe-bx}" height="13" rx="2" fill="#1E9E68"/>`;
+  s+=`<text x="${(bx+bxe)/2}" y="${y-6}" font-size="7.5" fill="#fff" text-anchor="middle">Base · Caterlink · £20.11m</text>`;
+  // extensions dashed to 2030
+  const ex2=yrX(2030);
+  s+=`<rect x="${bxe}" y="${y-16}" width="${ex2-bxe}" height="13" rx="2" fill="none" stroke="#B0722A" stroke-dasharray="3 2"/>`;
+  s+=`<text x="${(bxe+ex2)/2}" y="${y-6}" font-size="7" fill="#B0722A" text-anchor="middle">+2 opt.</text>`;
+  // award marker Dec 2024
+  s+=`<circle cx="${yrX(2024.95)}" cy="${y}" r="3" fill="var(--text)"/>`;
+  // Sept 2026 door
+  const dx=yrX(2026.67);
+  s+=`<line x1="${dx}" y1="${y-30}" x2="${dx}" y2="${y+3}" stroke="#A4522F" stroke-width="2"/>`;
+  s+=`<rect x="${dx-3}" y="${y-34}" width="6" height="6" fill="#A4522F"/>`;
+  s+=`<text x="${dx}" y="${y-38}" font-size="8" fill="#A4522F" font-weight="700" text-anchor="middle">Sept 2026 — the door</text>`;
+  s+=`<text x="${dx}" y="${y+26}" font-size="7.5" fill="#5A82A0" text-anchor="middle">secondary FSM · in-house option opens</text>`;
+  svg.innerHTML=s;
+}
+function setBPFuture(on){
+  bpFuture=on;
+  document.getElementById('bp-cur').classList.toggle('active',!on);
+  document.getElementById('bp-fut').classList.toggle('active',on);
+  document.getElementById('bp-future-ctrl').style.display=on?'block':'none';
+  renderBP();
+  // reveal where the new demand is: auto-enable secondary schools layer
+  if(on && !ovState.schsec) togOv('schsec');
+}
+function setTakeup(v){ bpTakeup=(+v)/100; document.getElementById('bp-takeup-v').textContent=Math.round(+v)+'%'; renderBP(); }
+
+// open/close the right-panel buying-power dock
+window.openSF=function(){
+  document.body.classList.remove('chart-open');           // avoid width clash with the stats chart dock
+  document.body.classList.add('sf-open');
+  renderBP(); renderBPTimeline();
+  setTimeout(()=>map.invalidateSize(),140);
+};
+window.closeSF=function(){ document.body.classList.remove('sf-open'); setTimeout(()=>map.invalidateSize(),140); };
+
+// spatial ↔ graph: click a school on the map → mark its share in the dock
+let bpHiMarker=null;
+function selectSchoolBP(s, marker){
+  selectedSchool=s;
+  if(!document.body.classList.contains('sf-open')) openSF();
+  refreshSelected();
+  renderBP();
+  // highlight the clicked marker
+  if(bpHiMarker && bpHiMarker.setStyle) bpHiMarker.setStyle({weight:1.5});
+  if(marker && marker.setStyle){ marker.setStyle({weight:4,color:'#F5A623'}); bpHiMarker=marker; marker.bringToFront&&marker.bringToFront(); }
+}
+function refreshSelected(){
+  const el=document.getElementById('bp-selected'); if(!el||!selectedSchool) return;
+  const s=selectedSchool, spend=s.nor?estCost(s.nor):0;
+  const isSec=/secondary|16 plus|all-through/i.test(s.phase||'');
+  el.style.display='block';
+  el.innerHTML=`<b style="color:var(--text)">${s.name}</b><br>${s.phase||''} · ${s.nor||'?'} pupils${s.fsm!=null?(' · '+s.fsm+'% FSM'):''}<br>Est. meal spend: <b style="color:#F5A623">£${spend.toLocaleString()}/yr</b> — ${isSec?'<span style="color:#9b59b6">part of the future secondary uplift</span>':'in the current contract'}`;
+}
+// draw once data + DOM ready
+setTimeout(()=>{ renderBP(); renderBPTimeline(); }, 300);
+
+// Extend togOv for Narrative II+III+IV layers
 const _origTogOv2=togOv;
 togOv=function(k){
   const layerMap={
@@ -2374,13 +2817,16 @@ togOv=function(k){
     railfreight:railfreightLayer, producers:producersLayer, osmfarms:osmfarmsLayer,
     uc:ucLayer, fsm:fsmLayer, obes:obesLayer, pcn:pcnLayer, osmfetch3:osmfetch3Layer,
     imd:imdLayer, flood3:flood3Layer, nafra:nafraLayer,
+    supply:supplyLayer, schprim:schoolsPrimLayer, schsec:schoolsSecLayer,
   };
   if(k in layerMap){
     ovState[k]=!ovState[k];
     const sw=document.getElementById('sw-'+k), tn=document.getElementById('togn-'+k);
     if(sw) sw.classList.toggle('on',ovState[k]);
     if(tn) tn.classList.toggle('on',ovState[k]);
-    if(ovState[k]){ if(k==='osmfarms') loadOsmFarms(); if(k==='osmfetch3') loadSocialEnterprises(); if(k==='inflow') loadInflowRoutes(); if(k==='imd'){ loadIMD(); const lg=document.getElementById('imd-legend'); if(lg) lg.style.display='block'; } if(k==='obes'){ const lg=document.getElementById('obes-legend'); if(lg) lg.style.display='block'; } layerMap[k].addTo(map); }
+    if(ovState[k]){ if(k==='osmfarms') loadOsmFarms(); if(k==='osmfetch3') loadSocialEnterprises(); if(k==='inflow') loadInflowRoutes(); if((k==='schprim'||k==='schsec')){ buildSchools(); } if(k==='imd'){ loadIMD(); const lg=document.getElementById('imd-legend'); if(lg) lg.style.display='block'; } if(k==='obes'){ const lg=document.getElementById('obes-legend'); if(lg) lg.style.display='block'; } layerMap[k].addTo(map);
+      if((k==='schprim'||k==='schsec')){ const lyr=layerMap[k]; if(lyr.getLayers().length){ try{ map.fitBounds(lyr.getBounds(),{padding:[40,40],maxZoom:14,animate:false}); }catch(e){} } }
+    }
     else { map.removeLayer(layerMap[k]); if(k==='imd'){ const lg=document.getElementById('imd-legend'); if(lg) lg.style.display='none'; } if(k==='obes'){ const lg=document.getElementById('obes-legend'); if(lg) lg.style.display='none'; } }
     return;
   }

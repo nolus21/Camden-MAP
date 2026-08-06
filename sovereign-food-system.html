@@ -45,6 +45,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#090E07;color:#D8D4C
 .pf-card.selected .pf-card-meta{color:rgba(107,168,118,.6)}
 .pf-check{font-size:8px;font-family:Consolas,monospace;color:rgba(107,168,118,.9);flex-shrink:0;margin-top:3px;opacity:0;transition:opacity .18s}
 .pf-card.selected .pf-check{opacity:1}
+.pf-card-camden{background:rgba(46,38,24,.42)}
+.pf-card-camden:hover{background:rgba(58,47,28,.58)}
+.pf-card-camden.selected{background:rgba(66,52,30,.7)}
+.pf-pw-camden{background:rgba(178,148,74,.9)!important;color:#1c1610!important}
+body.light-mode .pf-card-camden{background:rgba(238,230,208,.6)}
+body.light-mode .pf-card-camden:hover{background:rgba(232,222,196,.75)}
+body.light-mode .pf-card-camden.selected{background:rgba(226,212,176,.7)}
 #sb-footer{padding:10px 14px;border-top:1px solid rgba(42,57,32,.3);display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 
 /* ── CANVAS AREA ── */
@@ -120,6 +127,15 @@ canvas{display:block;cursor:crosshair;touch-action:none;user-select:none}
 /* ── KPI OVERLAY ── */
 #overlay{position:fixed;inset:0;background:rgba(9,14,7,.97);z-index:150;overflow-y:auto;display:none;padding:48px 32px 64px}
 #overlay.open{display:block}
+#overlay.dock-right{inset:auto;top:0;right:0;bottom:0;width:min(50vw,760px);background:rgba(9,14,7,.98);padding:44px 8px 24px 14px;border-left:1px solid rgba(107,168,118,.4);box-shadow:-10px 0 34px rgba(0,0,0,.4)}
+#overlay.dock-right .kpi-wrap{max-width:none;overflow-x:auto}
+#overlay.dock-right table.kpi-tbl{min-width:0}
+#overlay.dock-right table.kpi-tbl td{padding:5px 7px;font-size:9px}
+#overlay.dock-right table.kpi-tbl th{padding:6px 7px}
+body.light-mode #overlay.dock-right{background:rgba(240,237,228,.99)}
+#dock-resize{display:none;position:fixed;top:0;bottom:0;width:9px;cursor:ew-resize;z-index:160;background:linear-gradient(90deg,rgba(178,148,74,0),rgba(178,148,74,.3))}
+#dock-resize:hover{background:linear-gradient(90deg,rgba(178,148,74,.14),rgba(178,148,74,.6))}
+#dock-resize::after{content:'⋮⋮';position:absolute;top:50%;left:-3px;transform:translateY(-50%);font-size:12px;color:rgba(210,190,150,.9);letter-spacing:-3px}
 #overlay-close{position:fixed;top:20px;right:20px;z-index:160;width:32px;height:32px;background:rgba(9,14,7,.95);border:1px solid rgba(42,57,32,.8);color:#4A5A3A;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s,color .2s}
 #overlay-close:hover{border-color:#6A7855;color:#D8D4C8}
 .ov-head{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#4A5A3A;font-family:Consolas,monospace;margin-bottom:28px}
@@ -140,6 +156,14 @@ table.kpi-tbl td.dim-c{border-left:1px solid rgba(42,57,32,.2)}
 table.kpi-tbl tr.comp-hdr td{background:rgba(14,20,9,.9);font-size:13px;font-family:'Palatino Linotype',Palatino,Georgia,serif;font-style:italic;padding:10px;border-bottom:1px solid rgba(42,57,32,.6)}
 .kpi-row-item{padding:2px 0;border-bottom:1px solid rgba(42,57,32,.15);color:#8A8870}
 .kpi-row-item:last-child{border-bottom:none}
+.kpi-row-item.touched{background:rgba(107,168,118,.16);border-radius:3px;padding:2px 4px;color:#C8D4B0}
+.kpi-bar{position:relative;height:5px;margin-top:3px;background:rgba(74,90,58,.16);border-radius:3px}
+.kpi-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:3px;opacity:.5}
+.kpi-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(9,14,7,.55)}
+body.light-mode .kpi-dot{box-shadow:0 0 0 1.5px rgba(240,237,228,.75)}
+table.kpi-tbl td.dim-c.cell-touched{background:rgba(107,168,118,.08)}
+body.light-mode .kpi-row-item.touched{background:rgba(120,170,90,.22);color:#2A3A18}
+body.light-mode table.kpi-tbl td.dim-c.cell-touched{background:rgba(120,170,90,.12)}
 .kpi-dir-tag{display:block;font-size:8px;font-family:Consolas,monospace;color:#3A4A2A;letter-spacing:.04em;margin-top:1px}
 
 /* ── CARD CREATOR ── */
@@ -609,6 +633,9 @@ body.light-mode .data-loading{color:rgba(55,72,35,.38)}
       <button class="mode-btn" id="btn-sim" style="border-color:rgba(120,140,60,.4);color:rgba(120,150,70,.75)">&#9670; Invest</button>
       <button class="mode-btn" id="btn-pdev" style="border-color:rgba(100,130,90,.4);color:rgba(90,140,100,.75)">&#9636; Portfolio Dev</button>
       <button class="mode-btn" id="btn-pdev2" style="border-color:rgba(90,150,120,.4);color:rgba(80,155,120,.8)">&#8862; Portfolio Dev 2</button>
+      <button class="mode-btn" id="btn-camden" style="border-color:rgba(150,120,90,.4);color:rgba(160,120,80,.8)">&#9673; Camden Layer</button>
+      <button class="mode-btn" id="btn-base" style="border-color:rgba(74,90,58,.35)">&#9678; Base Indicators</button>
+      <button class="mode-btn" id="btn-camden-pf" style="border-color:rgba(150,120,90,.4);color:rgba(160,120,80,.8)">&#9670; Camden Portfolio</button>
       <button class="mode-btn" id="btn-fw" style="border-color:rgba(60,100,70,.35);color:rgba(40,90,55,.6)">&#9711; Future Wheel</button>
       <button class="mode-btn" id="btn-theme" title="Toggle light / dark mode" style="padding:5px 9px;border-color:rgba(74,90,58,.3);color:rgba(74,90,58,.6)">&#9685;</button>
     </div>
@@ -620,7 +647,8 @@ body.light-mode .data-loading{color:rgba(55,72,35,.38)}
         <div id="sb-dims-list"></div>
       </div>
       <div class="sb-sec" id="sb-portfolio">
-        <div class="sb-sec-hdr"><span>Interventions <span id="pf-count-badge" style="color:rgba(107,168,118,.6);font-size:6px"></span></span><button id="add-card-btn">+ Add</button></div>
+        <div class="sb-sec-hdr"><span>Portfolio <span id="pf-count-badge" style="color:rgba(107,168,118,.6);font-size:6px"></span></span><button id="add-card-btn">+ Add</button></div>
+        <div class="cat-filter-bar" id="source-filter-bar"></div>
         <div class="cat-filter-bar" id="cat-filter-bar"></div>
         <div class="cat-filter-bar" id="pathway-filter-bar"></div>
         <div id="pf-cards-list"></div>
@@ -884,6 +912,17 @@ var RING_R={
   economic:90, equality:124, health:158, environment:194, preparedness:230
 };
 
+// ── Camden Borough Metrics — 27 SYSTEM outcomes (snapshot). All VC Domain = D (Consumption). ──
+// Each mapped to a Food System Goal (our dimension) + data availability. This is the "Camden layer".
+var CAMDEN_GOAL_DIM={'Economic Vitality':'economic','Environment':'environment','Health':'health','Equity and Fairness':'equality','Preparedness and resilience':'preparedness'};
+var CAMDEN_SYS=[{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"","goal":"Economic Vitality","avail":"No"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"","goal":"Economic Vitality","avail":"No"},{"outcome":"Camden’s food system contributes to tackling the climate crisis","indicator":"Per capita emissions of London boroughs by final product","goal":"Environment","avail":"Yes"},{"outcome":"Camden’s food system contributes to tackling the climate crisis","indicator":"Per capita household waste","goal":"Environment","avail":"Proxy"},{"outcome":"Camden’s food system contributes to tackling the climate crisis","indicator":"Amount of food waste redistributed through existing channels","goal":"Environment","avail":"No"},{"outcome":"Camden’s food system contributes to tackling the climate crisis","indicator":"Change in composition of household purchase of food and drink","goal":"Environment","avail":"No"},{"outcome":"Camden’s food system contributes to tackling the climate crisis","indicator":"% of procured food that meets the sustainable food standards","goal":"Environment","avail":"No"},{"outcome":"Food is a foundation of children’s and young people’s flourishing lives","indicator":"Percentage of primary students had 5 or more portions","goal":"Health","avail":"Yes"},{"outcome":"Residents eat a healthy and balanced diet","indicator":"Self-reported confidence levels in cooking healthy meals","goal":"Health","avail":"No"},{"outcome":"Food is a foundation of children’s and young people’s flourishing lives","indicator":"Increased understanding of nutrition","goal":"Health","avail":"No"},{"outcome":"Food is a foundation of children’s and young people’s flourishing lives","indicator":"Self-reported increase in cooking","goal":"Equity and Fairness","avail":""},{"outcome":"Food is a foundation of children’s and young people’s flourishing lives","indicator":"% children who are overweight or obese in Reception and Year 6","goal":"Equity and Fairness","avail":"Yes"},{"outcome":"Food is a foundation of children’s and young people’s flourishing lives","indicator":"Self-reported food literacy","goal":"Equity and Fairness","avail":"No"},{"outcome":"Food is a foundation of children’s and young people’s flourishing lives","indicator":"6-8 weeks breastfeeding","goal":"Health","avail":"Yes"},{"outcome":"Residents eat a healthy and balanced diet","indicator":"Share of adults and children who are overweight or obese","goal":"Health","avail":"Yes"},{"outcome":"Residents eat a healthy and balanced diet","indicator":"Food consumption habits in the borough","goal":"Health","avail":"No"},{"outcome":"Residents eat a healthy and balanced diet","indicator":"Percentage of adults who meet the 5-a-day guidelines in Camden","goal":"Equity and Fairness","avail":"Yes"},{"outcome":"Residents eat a healthy and balanced diet","indicator":"Number of healthy food providers over the years","goal":"Health","avail":"No"},{"outcome":"Residents eat a healthy and balanced diet","indicator":"%age of local residents involved in food growing","goal":"Preparedness and resilience","avail":"No"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Household food bank usage by region/country","goal":"Equity and Fairness","avail":"For Inner London"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Household food security status by region/country","goal":"Preparedness and resilience","avail":"For Inner London"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Fewer repeat users of emergency food services over time","goal":"Economic Vitality","avail":"No"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Number or percentage of households needing crisis food provision","goal":"Equity and Fairness","avail":"No"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Rate of change of disposable income vs food prices","goal":"Economic Vitality","avail":"For UK"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Number of Choice based food support v. crisis based","goal":"Equity and Fairness","avail":"No"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Number of residents interested in joining a choice based food support","goal":"Equity and Fairness","avail":"No"},{"outcome":"Residents are food secure, and don’t need to access crisis food provision","indicator":"Reported satisfaction with the food options available","goal":"Health","avail":"No"}];
+var CAMDEN_OUTCOME_SHORT={
+  "Residents are food secure, and don’t need to access crisis food provision":"Food secure · no crisis",
+  "Residents eat a healthy and balanced diet":"Healthy & balanced diet",
+  "Food is a foundation of children’s and young people’s flourishing lives":"Children flourishing",
+  "Camden’s food system contributes to tackling the climate crisis":"Climate action"
+};
+
 var ALL_KPIS=[
   {dim:'preparedness',comp:'a',n:'External industrial input intensity',d:'Annual spend on synthetic fertilisers, pesticides and imported feeds per hectare and per unit of output.',dir:'Reduce'},
   {dim:'preparedness',comp:'a',n:'Share of farms using territorial fertility sources',d:'Farms using compost, manure, nitrogen-fixing crops, recycled nutrients or locally produced feed.',dir:'Increase'},
@@ -1087,6 +1126,14 @@ function RadialDiagram(canvas,onSelect){
   this.selectedKpi=null;
   this.selectedElem=null;
   this.analyzeMode=false;
+  this.camdenLayer=false;
+  this.baseHidden=false;
+  this.bandsMatrixHidden=true;  // morph draws only the cones; the docked KPI matrix replaces the slider tracks
+  this.camdenPortfolio=false;   // Camden delivery-portfolio coverage lens
+  this.camdenProjects=null;     // fetched action-plan projects
+  this.camdenDeployed={};       // project id → deployed?
+  this._camdenCovered=null;     // {indicator: true} covered by deployed projects
+  this._camdenStats=null;       // {deployed, gap}
   this.scores=null;
   this.dotScores=null;
   this._animFrame=null;
@@ -1254,6 +1301,10 @@ RadialDiagram.prototype._onMove=function(e){
   var dist=Math.hypot(mx-this.cx,my-this.cy);
   // In band (Portfolio Dev 2) mode: only hover the morphed dots
   if(this.morphMode){
+    if(this.camdenLayer){
+      var cbh=this._camdenHit(mx,my);
+      if(cbh){this.canvas.style.cursor='pointer';setCamdenTip(cbh,e.clientX,e.clientY);return;}
+    }
     var nb=this._nearest(mx,my,this._r(16));
     var prevb=this.hovered;this.hovered=nb;this.hoveredElem=null;
     this.canvas.style.cursor=nb?'pointer':'default';
@@ -1278,6 +1329,17 @@ RadialDiagram.prototype._onMove=function(e){
     if(best)updateTip(best,null,e.clientX,e.clientY);
     else updateTip(null);
     return;
+  }
+  // Camden layer hover — outcome arcs + indicator dots
+  if(this.camdenLayer){
+    var ch=this._camdenHit(mx,my);
+    if(ch){
+      this.canvas.style.cursor='pointer';
+      if(this.hovered||this.hoveredElem){this.hovered=null;this.hoveredElem=null;this.render();}
+      setCamdenTip(ch,e.clientX,e.clientY);
+      return;
+    }
+    if(this.baseHidden){this.canvas.style.cursor='default';updateTip(null);return;}
   }
   var n=this._nearest(mx,my,this._r(18));
   var ne=n?null:this._nearestElem(mx,my,this._r(13));
@@ -1366,6 +1428,175 @@ RadialDiagram.prototype.reset=function(){
   this.onSelect('none',null);this.render();renderElemLabels();
 };
 
+// ── Camden layer: the 27 system outcomes/indicators, all in the D (Consumption) quadrant ──
+// Coverage lens: which Camden metrics do the deployed delivery projects reach?
+// Links are outcome-level; we narrow them to each project's own dimension so a
+// Health project only "covers" the health metrics under its outcome.
+// normalize indicator strings so the embedded snapshot joins to live DB strings
+// despite punctuation / whitespace / curly-quote differences
+function camNorm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+// A Camden metric's dot is "covered" when a deployed project shares its outcome
+// (our connection is outcome-level; joining on outcome is canonical & robust).
+RadialDiagram.prototype._camCov=function(row){
+  var o=row&&(row.outcome!==undefined?row.outcome:row);
+  return !!(this._camdenCovered&&this._camdenCovered[camNorm(o)]);
+};
+RadialDiagram.prototype._computeCamdenCoverage=function(){
+  var self=this, covered={}, deployed=0, gap=0;
+  (this.camdenProjects||[]).forEach(function(p){
+    if(!self.camdenDeployed[p.id])return;
+    deployed++;
+    var hasD=p.vc&&p.vc.indexOf('D')>=0;
+    if(p.vc&&p.vc.length&&!hasD)gap++;          // delivery outside Camden's measured D
+    // record the outcome(s) this project touches (all its covers share one outcome)
+    (p.covers||[]).forEach(function(c){ if(c.outcome)covered[camNorm(c.outcome)]=true; });
+  });
+  this._camdenCovered=covered;
+  this._camdenStats={deployed:deployed,gap:gap,total:(this.camdenProjects||[]).length};
+};
+
+// Draw the coverage state over the stored Camden dots (halo = covered).
+RadialDiagram.prototype._drawCamdenCoverage=function(ctx,rBig){
+  var self=this; if(!this.camdenPortfolio||!this._camdenCovered)return;
+  (this._camdenDots||[]).forEach(function(dt){
+    var col=DIM_META[dt.dim].color, cov=self._camCov(dt.row);
+    ctx.save();
+    if(cov){
+      ctx.beginPath();ctx.arc(dt.x,dt.y,self._r(rBig||8.5),0,Math.PI*2);
+      ctx.fillStyle=hexRgba(col,0.16);ctx.fill();
+      ctx.strokeStyle=hexRgba(col,0.95);ctx.lineWidth=self._r(1.8);ctx.stroke();
+    }else{
+      // mute uncovered so blind spots recede
+      ctx.beginPath();ctx.arc(dt.x,dt.y,self._r(5.2),0,Math.PI*2);
+      ctx.fillStyle='rgba(120,124,110,.34)';ctx.fill();
+    }
+    ctx.restore();
+  });
+};
+
+RadialDiagram.prototype._drawCamdenLayer=function(ctx){
+  var self=this, d=SECTORS.d, gap=0.09;
+  var a0=d.start+gap, a1=d.end-gap;                 // D quadrant angular span
+  self._camdenDots=[]; self._camdenArcs=[];          // hit-regions for hover
+  // group indicators by our dimension (from Food System Goals)
+  var byDim={};
+  CAMDEN_SYS.forEach(function(r){var dm=CAMDEN_GOAL_DIM[r.goal]||'equality';(byDim[dm]=byDim[dm]||[]).push(r);});
+
+  // ── indicator dots, placed on the D-quadrant dimension rings ──
+  ['economic','equality','health','environment','preparedness'].forEach(function(dm){
+    var list=byDim[dm];if(!list)return;
+    var rBase=self._r(RING_R[dm]), col=DIM_META[dm].color, n=list.length;
+    list.forEach(function(r,i){
+      var t=n>1?i/(n-1):0.5, ang=a0+0.06+t*((a1-a0)-0.12);
+      var x=self.cx+Math.cos(ang)*rBase, y=self.cy+Math.sin(ang)*rBase;
+      var yes=/yes/i.test(r.avail), soft=/proxy|uk|london/i.test(r.avail);
+      self._camdenDots.push({x:x,y:y,r:self._r(6),row:r,dim:dm});
+      ctx.save();
+      ctx.beginPath();ctx.arc(x,y,self._r(4.4),0,Math.PI*2);
+      ctx.fillStyle=yes?col:hexRgba(col,soft?0.4:0.0);ctx.fill();
+      if(!yes){ctx.strokeStyle=col;ctx.lineWidth=self._r(1.5);ctx.stroke();}
+      else{ctx.beginPath();ctx.arc(x,y,self._r(1.7),0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fill();}
+      ctx.restore();
+    });
+  });
+
+  // coverage halos over the indicator dots (delivery-portfolio lens)
+  if(self.camdenPortfolio)self._drawCamdenCoverage(ctx,8.5);
+
+  // ── outer ring: the 4 long-term outcomes, arced over the D quadrant ──
+  var outcomes=Object.keys(CAMDEN_OUTCOME_SHORT).filter(function(o){return CAMDEN_SYS.some(function(r){return r.outcome===o;});});
+  var ro=self._r(246), rw=self._r(15), per=(a1-a0)/outcomes.length, leg=[];
+  outcomes.forEach(function(o,i){
+    var items=CAMDEN_SYS.filter(function(r){return r.outcome===o;});
+    var dc={};items.forEach(function(r){var dm=CAMDEN_GOAL_DIM[r.goal]||'equality';dc[dm]=(dc[dm]||0)+1;});
+    var dom=Object.keys(dc).sort(function(x,y){return dc[y]-dc[x];})[0], col=DIM_META[dom].color;
+    var oa0=a0+i*per+0.02, oa1=a0+(i+1)*per-0.02;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(self.cx,self.cy,ro+rw,oa0,oa1);
+    ctx.arc(self.cx,self.cy,ro,oa1,oa0,true);
+    ctx.closePath();
+    ctx.fillStyle=hexRgba(col,0.55);ctx.fill();
+    ctx.strokeStyle=hexRgba(col,0.85);ctx.lineWidth=self._r(0.8);ctx.stroke();
+    ctx.restore();
+    var yes=items.filter(function(r){return /yes/i.test(r.avail);}).length;
+    self._camdenArcs.push({oa0:oa0,oa1:oa1,ro:ro,rw:rw,outcome:o,yes:yes,tot:items.length,col:col});
+    leg.push({name:CAMDEN_OUTCOME_SHORT[o],col:col,yes:yes,tot:items.length});
+  });
+
+  // ── legend, in the empty bottom-right (B · Production) quadrant ──
+  var lx=self.cx+self._r(52), ly=self.cy+self._r(24);
+  var yesTot=CAMDEN_SYS.filter(function(r){return /yes/i.test(r.avail);}).length;
+  ctx.save();ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillStyle='rgba(196,204,168,.92)';ctx.font='bold '+self._fs(7.5)+' Consolas,monospace';
+  ctx.fillText('CAMDEN MISSION · SYSTEM OUTCOMES',lx,ly);ly+=self._r(13);
+  ctx.fillStyle='rgba(150,160,135,.85)';ctx.font=self._fs(6.5)+' Consolas,monospace';
+  ctx.fillText('All in D · Consumption ('+CAMDEN_SYS.length+' metrics · '+yesTot+' measurable now)',lx,ly);ly+=self._r(15);
+  leg.forEach(function(g){
+    ctx.beginPath();ctx.arc(lx+self._r(4),ly+self._r(5),self._r(4),0,Math.PI*2);ctx.fillStyle=g.col;ctx.fill();
+    ctx.fillStyle='rgba(200,206,184,.92)';ctx.font=self._fs(7)+' Consolas,monospace';ctx.textBaseline='middle';
+    ctx.fillText(g.name+'  ·  '+g.yes+'/'+g.tot+' measurable',lx+self._r(13),ly+self._r(5));
+    ctx.textBaseline='top';ly+=self._r(15);
+  });
+  // coverage summary when the delivery portfolio is active
+  if(self.camdenPortfolio&&self._camdenStats){
+    var st=self._camdenStats, nCov=Object.keys(self._camdenCovered||{}).length;
+    var covHere=CAMDEN_SYS.filter(function(r){return self._camCov(r);}).length;
+    ly+=self._r(4);
+    ctx.fillStyle='rgba(210,196,150,.95)';ctx.font='bold '+self._fs(7)+' Consolas,monospace';
+    ctx.fillText('◆ DELIVERY PORTFOLIO',lx,ly);ly+=self._r(12);
+    ctx.fillStyle='rgba(170,178,150,.9)';ctx.font=self._fs(6.5)+' Consolas,monospace';
+    ctx.fillText(st.deployed+'/'+st.total+' projects deployed · '+covHere+'/'+CAMDEN_SYS.length+' metrics covered',lx,ly);ly+=self._r(11);
+    if(st.gap>0){ctx.fillStyle='rgba(200,130,90,.95)';
+      ctx.fillText('⚠ '+st.gap+' projects in B/C — delivery Camden does not measure',lx,ly);ly+=self._r(11);}
+  }
+  ctx.restore();
+};
+
+// Camden layer in Portfolio Dev 2 — dots in the D column of the matrix, at their dimension rows
+RadialDiagram.prototype._drawCamdenBands=function(ctx){
+  var self=this, b=this._band; if(!b||!b.camden)return;
+  self._camdenDots=[]; self._camdenArcs=[];
+  b.camden.forEach(function(L){
+    var r=L.row, col=DIM_META[L.dim].color;
+    var yes=/yes/i.test(r.avail), soft=/proxy|uk|london/i.test(r.avail);
+    // its own row: a dashed dimension-coloured track (distinct from the solid base sliders) + availability dot
+    ctx.save();
+    ctx.strokeStyle=hexRgba(col,0.30);ctx.lineWidth=self._r(1.6);ctx.lineCap='round';
+    ctx.setLineDash([self._r(2.5),self._r(2.5)]);
+    ctx.beginPath();ctx.moveTo(L.trackL,L.y);ctx.lineTo(L.trackR,L.y);ctx.stroke();
+    ctx.setLineDash([]);
+    var x=L.trackL+self._r(4);
+    ctx.beginPath();ctx.arc(x,L.y,self._r(4),0,Math.PI*2);
+    ctx.fillStyle=yes?col:hexRgba(col,soft?0.4:0.0);ctx.fill();
+    if(!yes){ctx.strokeStyle=col;ctx.lineWidth=self._r(1.3);ctx.stroke();}
+    else{ctx.beginPath();ctx.arc(x,L.y,self._r(1.5),0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fill();}
+    ctx.restore();
+    self._camdenDots.push({x:x,y:L.y,r:self._r(6),row:r,dim:L.dim});
+  });
+  if(self.camdenPortfolio)self._drawCamdenCoverage(ctx,7.5);
+  // "CAMDEN" flag over the D column header
+  var dcol=(b.cols||[]).filter(function(c){return c.comp==='d';})[0];
+  if(dcol){
+    ctx.save();
+    ctx.fillStyle='rgba(196,204,168,.9)';ctx.font='bold '+self._fs(6.5)+' Consolas,monospace';
+    ctx.textAlign='center';ctx.textBaseline='bottom';
+    ctx.fillText('◉ CAMDEN', dcol.x0+dcol.w/2, b.top+b.headH-self._r(2));
+    ctx.restore();
+  }
+};
+
+RadialDiagram.prototype._camdenHit=function(mx,my){
+  var dots=this._camdenDots||[];
+  for(var i=0;i<dots.length;i++){var dt=dots[i];if(Math.hypot(dt.x-mx,dt.y-my)<=dt.r+2)return{type:'dot',data:dt};}
+  var arcs=this._camdenArcs||[];
+  var a=Math.atan2(my-this.cy,mx-this.cx);if(a<0)a+=2*Math.PI;
+  var rad=Math.hypot(mx-this.cx,my-this.cy);
+  for(var j=0;j<arcs.length;j++){var ar=arcs[j];
+    if(rad>=ar.ro&&rad<=ar.ro+ar.rw&&a>=ar.oa0&&a<=ar.oa1)return{type:'arc',data:ar};}
+  return null;
+};
+
 RadialDiagram.prototype.render=function(){
   var ctx=this.ctx;
   ctx.clearRect(0,0,this.W||this.SIZE,this.H||this.SIZE);
@@ -1379,6 +1610,7 @@ RadialDiagram.prototype.render=function(){
     if(m<0.02)this._drawCardEffects(ctx);
     this._drawRingLabels(ctx);
     this._drawArcs(ctx);
+    if(this.camdenLayer)this._drawCamdenLayer(ctx);
     ctx.restore();
   }
   // Band chrome (Portfolio Dev 2) — fades in
@@ -1388,7 +1620,8 @@ RadialDiagram.prototype.render=function(){
     ctx.restore();
   }
   // Dots morph their positions via _dotPos, so draw at full opacity always
-  this._drawDots(ctx);
+  if(!this.baseHidden&&!(this.morphMode&&this.bandsMatrixHidden))this._drawDots(ctx);
+  if(this.camdenLayer&&(this.morphT||0)>0.5&&!this.bandsMatrixHidden)this._drawCamdenBands(ctx);
   if(m<1){
     ctx.save();ctx.globalAlpha=1-m;
     this._drawCenter(ctx);
@@ -1617,6 +1850,15 @@ RadialDiagram.prototype._computeBandLayout=function(){
   var self=this,W=this.W,H=this.H;
   var top=self._r(26),bottom=self._r(10),leftPad=self._r(4);
   var leftW=Math.min(W*0.34,self._r(300));   // cones region — longer cones, capped
+  // cones-only mode: expand the cones to fill the canvas left of the docked matrix
+  if(self.bandsMatrixHidden){
+    var usableFrac=1, cv=self.ctx&&self.ctx.canvas, dk=document.getElementById('overlay');
+    if(cv&&dk&&dk.classList.contains('dock-right')&&dk.classList.contains('open')){
+      var cr=cv.getBoundingClientRect(), dr=dk.getBoundingClientRect();
+      usableFrac=Math.max(0.25,1-Math.max(0,cr.right-dr.left)/cr.width);
+    }
+    leftW=Math.max(self._r(140), W*usableFrac - self._r(26));
+  }
   var gap=self._r(12);
   var rightX0=leftW+gap;
 
@@ -1647,7 +1889,10 @@ RadialDiagram.prototype._computeBandLayout=function(){
   var rightPad=self._r(6);
   var colW=(W-rightPad-colsX0)/4;
   var rowH=(H-top-bottom-headH)/5;
-  var byKey={},rowsMeta=[],colsMeta=[];
+  var byKey={},rowsMeta=[],colsMeta=[],camdenPos=[];
+  // Camden system metrics by dimension (all sector D) — only laid out when the layer is on
+  var camdenByDim={};
+  if(self.camdenLayer){CAMDEN_SYS.forEach(function(r){var dm=CAMDEN_GOAL_DIM[r.goal]||'equality';(camdenByDim[dm]=camdenByDim[dm]||[]).push(r);});}
   comps.forEach(function(comp,ci){colsMeta.push({comp:comp,x0:colsX0+ci*colW,w:colW});});
   dimOrder.forEach(function(dim,ri){
     var rTop=top+headH+ri*rowH;
@@ -1655,15 +1900,21 @@ RadialDiagram.prototype._computeBandLayout=function(){
       var cellX0=colsX0+ci*colW;
       var items=self.positions.filter(function(p){return p.dim===dim&&p.comp===comp;})
         .slice().sort(function(a,b){return a.angle-b.angle;});
-      var nc=items.length,pad=self._r(3);
+      // In the D column, Camden metrics for this dimension get their own interleaved rows
+      var camItems=(comp==='d'&&self.camdenLayer)?(camdenByDim[dim]||[]):[];
+      var nc=items.length+camItems.length,pad=self._r(3);
       var innerTop=rTop+pad,innerH=rowH-2*pad,subH=innerH/Math.max(nc,1);
       items.forEach(function(p,k){
         byKey[self._kpiKey(p)]={trackL:cellX0+self._r(5),trackR:cellX0+colW-self._r(22),numX:cellX0+colW-self._r(4),y:innerTop+(k+0.5)*subH};
       });
+      camItems.forEach(function(r,k){
+        var idx=items.length+k;
+        camdenPos.push({row:r,dim:dim,trackL:cellX0+self._r(5),trackR:cellX0+colW-self._r(10),y:innerTop+(idx+0.5)*subH});
+      });
     });
     rowsMeta.push({dim:dim,rTop:rTop,rowH:rowH,markerX:colsX0-self._r(9),labelX:rightX0+self._r(2)});
   });
-  this._band={byKey:byKey,rows:rowsMeta,cols:colsMeta,cones:cones,leftW:leftW,rightX0:rightX0,colsX0:colsX0,colW:colW,top:top,headH:headH,bottom:bottom};
+  this._band={byKey:byKey,rows:rowsMeta,cols:colsMeta,camden:camdenPos,cones:cones,leftW:leftW,rightX0:rightX0,colsX0:colsX0,colW:colW,top:top,headH:headH,bottom:bottom};
 };
 RadialDiagram.prototype._bandPos=function(p){
   var L=this._band&&this._band.byKey[this._kpiKey(p)];
@@ -1740,6 +1991,7 @@ RadialDiagram.prototype._drawBands=function(ctx){
   var self=this,b=this._band;if(!b)return;var W=this.W,H=this.H;
   self._moreChips=[];
   ctx.save();
+  if(!self.bandsMatrixHidden){
   // ── Matrix column headers (A/B/C/D) + vertical dividers ──
   b.cols.forEach(function(c){
     var cm=COMP_META[c.comp];
@@ -1787,6 +2039,7 @@ RadialDiagram.prototype._drawBands=function(ctx){
       ctx.globalAlpha=1;
     }
   });
+  } // end !bandsMatrixHidden
   // ── Cones (left) with attached mini-cards ──
   b.cones.forEach(function(c){
     var col=(typeof pathwayColor==='function')?pathwayColor(c.pw):'#8A8A78';
@@ -2166,6 +2419,23 @@ function updateTip(pos,elemPos,cx,cy){
   tipEl.style.top=Math.max(8,Math.min(ry-12,window.innerHeight-64))+'px';
 }
 
+// Tooltip for the Camden layer (indicator dots + outcome arcs)
+function setCamdenTip(ch,cx,cy){
+  tipEl.style.display='block';
+  if(ch.type==='dot'){
+    var r=ch.data.row, dm=DIM_META[ch.data.dim];
+    var av=(r.avail||'').trim()||'No';
+    tipEl.innerHTML='<div class="tip-name">'+(r.indicator||'(indicator not yet defined)')+'</div>'+
+      '<div class="tip-tags">'+(CAMDEN_OUTCOME_SHORT[r.outcome]||'')+' &middot; '+(dm?dm.label:r.goal)+' &middot; '+av+' data</div>';
+  }else{
+    var a=ch.data;
+    tipEl.innerHTML='<div class="tip-name">'+a.outcome+'</div>'+
+      '<div class="tip-tags">Camden long-term outcome &middot; '+a.yes+'/'+a.tot+' measurable</div>';
+  }
+  tipEl.style.left=Math.min(cx+14,window.innerWidth-254)+'px';
+  tipEl.style.top=Math.max(8,Math.min(cy-12,window.innerHeight-64))+'px';
+}
+
 var panelEl=document.getElementById('panel'),panelInner=document.getElementById('panel-inner');
 function openPanel(html){panelInner.innerHTML=html;panelEl.classList.add('open');}
 function closePanel(){panelEl.classList.remove('open');}
@@ -2346,16 +2616,79 @@ function buildVisionOverlay(){
 }
 
 var kpiPivot=false;
+var kpiDock=false;
+var kpiAffectedOnly=false;
+
+// A KPI-matrix cell: base KPIs (unless hidden) + Camden metrics (if layer on; all in D)
+// Each indicator carries a compact score/availability bar; indicators a deployed
+// portfolio card touches are highlighted (sovereign via boost, Camden via coverage).
+function kpiCell(comp,dim,affectedOnly){
+  var out='', col=DIM_META[dim].color;
+  if(!diagram.baseHidden){
+    ALL_KPIS.filter(function(k){return k.comp===comp&&k.dim===dim;}).forEach(function(k){
+      var key=k.dim+':'+k.comp+':'+k.n;
+      var boost=diagram._getPortfolioBoost?diagram._getPortfolioBoost(key):0;
+      var base=(diagram.dotScores&&diagram.dotScores[key]!=null)?diagram.dotScores[key]:0.6;
+      var eff=Math.min(1,base+boost), touched=boost>0.001, pct=Math.round(eff*100);
+      if(affectedOnly&&!touched)return;
+      out+='<div class="kpi-row-item'+(touched?' touched':'')+'">'+k.n+'<span class="kpi-dir-tag">→ '+k.dir+'</span>'+
+        '<div class="kpi-bar"><div class="kpi-bar-fill" style="width:'+pct+'%;background:'+hexRgba(col,touched?0.9:0.35)+'"></div>'+
+        '<div class="kpi-dot" style="left:'+pct+'%;background:'+(touched?col:hexRgba(col,0.7))+'"></div></div></div>';
+    });
+  }
+  if(diagram.camdenLayer&&comp==='d'){
+    CAMDEN_SYS.filter(function(r){return (CAMDEN_GOAL_DIM[r.goal]||'equality')===dim;}).forEach(function(r){
+      var yes=/yes/i.test(r.avail), soft=/proxy|uk|london/i.test(r.avail), av=(r.avail||'').trim()||'No';
+      var cov=diagram.camdenPortfolio&&diagram._camCov&&diagram._camCov(r);
+      if(affectedOnly&&!cov)return;
+      var fill=yes?1:soft?0.5:0.15, cpct=Math.round(fill*100);
+      out+='<div class="kpi-row-item'+(cov?' touched':'')+'" style="border-left:2px solid '+col+';padding-left:6px;margin:2px 0">'+
+        '<span style="font-family:Consolas,monospace;font-size:8px;color:'+col+'">'+(yes?'●':'○')+'</span> '+
+        (r.indicator||'('+CAMDEN_OUTCOME_SHORT[r.outcome]+' — indicator TBD)')+
+        '<span class="kpi-dir-tag" style="color:'+(yes?'#7FB98A':'rgba(150,140,110,.8)')+'">'+av+(cov?' · covered':'')+'</span>'+
+        '<div class="kpi-bar"><div class="kpi-bar-fill" style="width:'+cpct+'%;background:'+hexRgba(col,cov?0.9:0.3)+'"></div>'+
+        '<div class="kpi-dot" style="left:'+cpct+'%;background:'+(cov?col:hexRgba(col,0.6))+'"></div></div></div>';
+    });
+  }
+  return out;   // '' when nothing to show (caller decides '—' vs skipping the row)
+}
+var EMDASH_CELL='<span style="color:rgba(42,57,32,.5);font-size:9px">—</span>';
+// does the deployed portfolio touch any indicator in this (comp,dim) cell?
+function cellHasPortfolio(comp,dim){
+  if(!diagram.baseHidden&&diagram._getPortfolioBoost){
+    for(var i=0;i<ALL_KPIS.length;i++){var k=ALL_KPIS[i];
+      if(k.comp===comp&&k.dim===dim&&diagram._getPortfolioBoost(k.dim+':'+k.comp+':'+k.n)>0.001)return true;}
+  }
+  if(diagram.camdenPortfolio&&comp==='d'&&diagram._camCov){
+    for(var j=0;j<CAMDEN_SYS.length;j++){var r=CAMDEN_SYS[j];
+      if((CAMDEN_GOAL_DIM[r.goal]||'equality')===dim&&diagram._camCov(r))return true;}
+  }
+  return false;
+}
 
 function buildKpiTableOverlay(){
   var dims=Object.keys(DIM_META);
   var comps=['a','b','c','d'];
-  var html='<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px">'+
-    '<div class="ov-head" style="margin-bottom:0">KPI Matrix — 100 Indicators across 5 Dimensions</div>'+
+  var camN=diagram.camdenLayer?CAMDEN_SYS.length:0;
+  var tglBtn=function(label,on){return '<button onclick="'+
+    (label==='Camden'?'diagram.camdenLayer=!diagram.camdenLayer':'diagram.baseHidden=!diagram.baseHidden')+
+    ';document.getElementById(\'overlay-inner\').innerHTML=buildKpiTableOverlay();" '+
+    'style="padding:5px 12px;background:'+(on?'rgba(107,168,118,.28)':'rgba(9,14,7,.7)')+';border:1px solid rgba(107,168,118,.5);color:rgba(190,215,170,.95);font-family:Consolas,monospace;font-size:9px;letter-spacing:.1em;text-transform:none;cursor:pointer;white-space:nowrap">'+label+' '+(on?'ON':'OFF')+'</button>';};
+  var html='<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;gap:10px;flex-wrap:wrap">'+
+    '<div class="ov-head" style="margin-bottom:0">KPI Matrix'+(diagram.camdenLayer?' + Camden ('+camN+' system metrics, all in D)':' — 100 Indicators across 5 Dimensions')+'</div>'+
+    '<div style="display:flex;gap:8px;align-items:center">'+
+    tglBtn('Camden',diagram.camdenLayer)+
+    tglBtn('Base',!diagram.baseHidden)+
     '<button onclick="kpiPivot=!kpiPivot;document.getElementById(\'overlay-inner\').innerHTML=buildKpiTableOverlay();" '+
-    'style="padding:5px 14px;background:rgba(9,14,7,.7);border:1px solid rgba(107,168,118,.5);color:rgba(180,210,160,.9);font-family:Consolas,monospace;font-size:9px;letter-spacing:.12em;text-transform:none;cursor:pointer;white-space:nowrap;flex-shrink:0">'+
-    (kpiPivot?'⇄  A/B/C/D as columns':'⇄  Dimensions as columns')+'</button>'+
-    '</div>';
+    'style="padding:5px 12px;background:rgba(9,14,7,.7);border:1px solid rgba(107,168,118,.5);color:rgba(180,210,160,.9);font-family:Consolas,monospace;font-size:9px;letter-spacing:.1em;text-transform:none;cursor:pointer;white-space:nowrap">'+
+    (kpiPivot?'⇄ A/B/C/D cols':'⇄ Dim cols')+'</button>'+
+    '<button onclick="kpiDock=!kpiDock;document.getElementById(\'overlay\').classList.toggle(\'dock-right\',kpiDock);document.getElementById(\'overlay-inner\').innerHTML=buildKpiTableOverlay();" '+
+    'style="padding:5px 12px;background:'+(kpiDock?'rgba(150,120,90,.3)':'rgba(9,14,7,.7)')+';border:1px solid rgba(178,148,74,.6);color:rgba(210,190,150,.95);font-family:Consolas,monospace;font-size:9px;letter-spacing:.1em;text-transform:none;cursor:pointer;white-space:nowrap">'+
+    (kpiDock?'⤢ Full screen':'⇥ Dock ⅓ right')+'</button>'+
+    '<button onclick="kpiAffectedOnly=!kpiAffectedOnly;document.getElementById(\'overlay-inner\').innerHTML=buildKpiTableOverlay();" '+
+    'style="padding:5px 12px;background:'+(kpiAffectedOnly?'rgba(107,168,118,.32)':'rgba(9,14,7,.7)')+';border:1px solid rgba(107,168,118,.55);color:rgba(190,215,170,.95);font-family:Consolas,monospace;font-size:9px;letter-spacing:.1em;text-transform:none;cursor:pointer;white-space:nowrap">'+
+    (kpiAffectedOnly?'● Affected only':'○ Affected only')+'</button>'+
+    '</div></div>';
 
   if(!kpiPivot){
     // Default: A/B/C/D as row groups, dimensions as columns
@@ -2365,14 +2698,12 @@ function buildKpiTableOverlay(){
       '</tr></thead><tbody>';
     comps.forEach(function(comp){
       var m=COMP_META[comp];
+      var cells=dims.map(function(dim){return kpiCell(comp,dim,kpiAffectedOnly);});
+      if(kpiAffectedOnly&&cells.every(function(c){return !c;}))return;   // hide empty sector group
       html+='<tr class="comp-hdr"><td colspan="'+(dims.length+1)+'" style="color:'+m.color+'">'+m.letter+' &mdash; '+m.title+'</td></tr>';
       html+='<tr><td style="color:'+m.color+';opacity:0.7;font-size:10px">'+m.tagline+'</td>';
-      dims.forEach(function(dim){
-        var kpis=ALL_KPIS.filter(function(k){return k.comp===comp&&k.dim===dim;});
-        html+='<td class="dim-c">';
-        if(kpis.length){kpis.forEach(function(k){html+='<div class="kpi-row-item">'+k.n+'<span class="kpi-dir-tag">→ '+k.dir+'</span></div>';});}
-        else{html+='<span style="color:rgba(42,57,32,.5);font-size:9px">—</span>';}
-        html+='</td>';
+      dims.forEach(function(dim,i){
+        html+='<td class="dim-c'+(cellHasPortfolio(comp,dim)?' cell-touched':'')+'">'+(cells[i]||EMDASH_CELL)+'</td>';
       });
       html+='</tr>';
     });
@@ -2385,14 +2716,12 @@ function buildKpiTableOverlay(){
       '</tr></thead><tbody>';
     dims.forEach(function(dim){
       var dm=DIM_META[dim];
+      var cells=comps.map(function(comp){return kpiCell(comp,dim,kpiAffectedOnly);});
+      if(kpiAffectedOnly&&cells.every(function(c){return !c;}))return;   // hide empty dimension group
       html+='<tr class="comp-hdr"><td colspan="'+(comps.length+1)+'" style="color:'+dm.color+'">'+dm.label+'</td></tr>';
       html+='<tr><td style="color:'+dm.color+';opacity:0.6;font-size:10px;font-style:italic">'+dim+'</td>';
-      comps.forEach(function(comp){
-        var kpis=ALL_KPIS.filter(function(k){return k.comp===comp&&k.dim===dim;});
-        html+='<td class="dim-c">';
-        if(kpis.length){kpis.forEach(function(k){html+='<div class="kpi-row-item">'+k.n+'<span class="kpi-dir-tag">→ '+k.dir+'</span></div>';});}
-        else{html+='<span style="color:rgba(42,57,32,.5);font-size:9px">—</span>';}
-        html+='</td>';
+      comps.forEach(function(comp,i){
+        html+='<td class="dim-c'+(cellHasPortfolio(comp,dim)?' cell-touched':'')+'">'+(cells[i]||EMDASH_CELL)+'</td>';
       });
       html+='</tr>';
     });
@@ -2405,6 +2734,7 @@ document.getElementById('btn-vision').addEventListener('click',function(){
   if(activeMode==='vision'){activeMode=null;overlayEl.classList.remove('open');this.classList.remove('active');return;}
   activeMode='vision';
   overlayInner.innerHTML=buildVisionOverlay();
+  overlayEl.classList.remove('dock-right');
   overlayEl.classList.add('open');
   document.getElementById('btn-vision').classList.add('active');
   document.getElementById('btn-kpis').classList.remove('active');
@@ -2413,6 +2743,7 @@ document.getElementById('btn-kpis').addEventListener('click',function(){
   if(activeMode==='kpis'){activeMode=null;overlayEl.classList.remove('open');this.classList.remove('active');return;}
   activeMode='kpis';
   overlayInner.innerHTML=buildKpiTableOverlay();
+  overlayEl.classList.toggle('dock-right',kpiDock);
   overlayEl.classList.add('open');
   document.getElementById('btn-kpis').classList.add('active');
   document.getElementById('btn-vision').classList.remove('active');
@@ -2551,6 +2882,7 @@ function getPortfolioCount(){
 // ── CATEGORY FILTER ──────────────────────────────────────────
 var activeCatFilter='';
 var activePathwayFilter='';
+var activeSourceFilter='';   // '' = both · 'sovereign' · 'camden'
 
 function getCats(card){
   return Array.isArray(card.category)?card.category:(card.category?[card.category]:[]);
@@ -2691,6 +3023,7 @@ function renderPortfolioSquares(){
 function buildPortfolio(){
   pfListEl.querySelectorAll('.pf-card').forEach(function(el){el.remove();});
   var visible=SEED_CARDS.filter(function(c){
+    if(activeSourceFilter==='camden')return false;   // Camden-only view hides sovereign cards
     if(c.userCreated)return true;
     if(activeCatFilter&&getCats(c).indexOf(activeCatFilter)<0)return false;
     if(activePathwayFilter&&getPathways(c).indexOf(activePathwayFilter)<0)return false;
@@ -2729,15 +3062,96 @@ function buildPortfolio(){
       if(diagram.analyzeMode&&diagram.scores)syncScorePanelValues(diagram.scores);
       if(typeof pdevOpen==='function'&&pdevOpen())renderPdev();
       if(document.getElementById('sim-overlay').classList.contains('open'))renderSim();
+      if(activeMode==='kpis')overlayInner.innerHTML=buildKpiTableOverlay();
     });
     pfListEl.appendChild(div);
   });
+  if(activeSourceFilter!=='sovereign')renderCamdenCardsInto();
   var n=getPortfolioCount();
   var badge=document.getElementById('pf-count-badge');
   if(badge)badge.textContent=n>0?n+' selected':'';
   renderPortfolioSquares();
+  buildSourceFilter();
   buildCatFilter();
   buildPathwayFilter();
+}
+
+// ── Camden delivery cards in the left portfolio panel ─────────
+var OC_SHORT_PF=(typeof CAMDEN_OUTCOME_SHORT!=='undefined')?CAMDEN_OUTCOME_SHORT:{};
+function camOcOf(p){return (p.covers&&p.covers[0]&&p.covers[0].outcome)||'Across all outcomes';}
+var _camdenLoadCbs=null;
+function loadCamdenProjects(cb){
+  if(diagram.camdenProjects!==null){cb&&cb();return;}
+  if(_camdenLoadCbs){if(cb)_camdenLoadCbs.push(cb);return;}  // fetch already in flight
+  _camdenLoadCbs=cb?[cb]:[];
+  fetch(NOTION_WORKER+'/action-plan').then(function(r){return r.json();}).then(function(d){
+    diagram.camdenProjects=(d.projects||[]);
+    diagram.camdenProjects.forEach(function(p){if(!(p.id in diagram.camdenDeployed))diagram.camdenDeployed[p.id]=true;});
+    diagram._computeCamdenCoverage();
+    var cbs=_camdenLoadCbs;_camdenLoadCbs=null;cbs.forEach(function(f){f&&f();});
+  }).catch(function(){diagram.camdenProjects=[];var cbs=_camdenLoadCbs;_camdenLoadCbs=null;cbs.forEach(function(f){f&&f();});});
+}
+function renderCamdenCardsInto(){
+  if(diagram.camdenProjects===null){
+    var note=document.createElement('div');note.className='pf-card';note.style.opacity='.6';
+    note.innerHTML='<div class="pf-card-body"><div class="pf-card-meta">loading Camden delivery portfolio…</div></div>';
+    pfListEl.appendChild(note);
+    loadCamdenProjects(function(){buildPortfolio();diagram.render();});
+    return;
+  }
+  diagram.camdenProjects.forEach(function(p){
+    var sel=!!diagram.camdenDeployed[p.id];
+    var dimKey=CAMDEN_GOAL_DIM[p.dim]||'health';
+    var dimColor=DIM_META[dimKey]?DIM_META[dimKey].color:'#b6944a';
+    var metaParts=['<span class="pf-pathway pf-pw-camden">◆ CAMDEN</span>'];
+    (p.vc||[]).forEach(function(v){metaParts.push('<span class="pf-scale">'+v+'</span>');});
+    if(p.status)metaParts.push('<span class="pf-status" style="color:'+statusColor(p.status)+'">'+p.status.replace(/ ?Strategic Priority/,'')+'</span>');
+    var oc=OC_SHORT_PF[camOcOf(p)]||'Across all outcomes';
+    var desc=p.tactic||p.shift||p.intermediate||'';
+    var div=document.createElement('div');
+    div.className='pf-card pf-card-camden'+(sel?' selected':'');
+    div.innerHTML='<div class="pf-card-bar" style="background:'+dimColor+'"></div>'
+      +'<div class="pf-card-body">'
+        +'<div class="pf-card-title">'+esc(p.project)+'</div>'
+        +'<div class="pf-card-meta">'+metaParts.join('')+'</div>'
+        +(desc?'<div class="pf-card-desc">'+esc(desc)+'</div>':'')
+        +'<div class="pf-card-cats"><span class="cat-tag">'+esc(oc)+'</span>'+(p.covers?'<span class="cat-tag" style="opacity:.6">covers '+p.covers.length+'</span>':'')+'</div>'
+      +'</div>'
+      +'<div class="pf-check">&#10003;</div>';
+    div.addEventListener('click',function(){
+      diagram.camdenDeployed[p.id]=!diagram.camdenDeployed[p.id];
+      diagram.camdenPortfolio=true;
+      if(!diagram.camdenLayer){diagram.camdenLayer=true;document.getElementById('btn-camden').classList.add('active');if(diagram.morphMode)diagram._computeBandLayout();}
+      diagram._computeCamdenCoverage();
+      div.classList.toggle('selected',!!diagram.camdenDeployed[p.id]);
+      diagram.render();
+      if(document.getElementById('sim-overlay')&&document.getElementById('sim-overlay').classList.contains('open')&&typeof renderSim==='function')renderSim();
+      if(activeMode==='kpis')overlayInner.innerHTML=buildKpiTableOverlay();
+    });
+    pfListEl.appendChild(div);
+  });
+  function esc(s){return String(s||'').replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+}
+function buildSourceFilter(){
+  var bar=document.getElementById('source-filter-bar');if(!bar)return;
+  bar.innerHTML='';
+  [['Both',''],['Sovereign','sovereign'],['◆ Camden delivery','camden']].forEach(function(pair){
+    var btn=document.createElement('button');
+    btn.className='cat-filter-btn'+(activeSourceFilter===pair[1]?' active':'');
+    if(pair[1]==='camden'){btn.style.borderColor='rgba(178,148,74,.6)';if(activeSourceFilter==='camden'){btn.style.background='rgba(178,148,74,.85)';btn.style.color='#1c1610';}}
+    btn.textContent=pair[0];
+    btn.addEventListener('click',function(){
+      activeSourceFilter=pair[1];
+      var wantCam=pair[1]!=='sovereign';
+      diagram.camdenPortfolio=wantCam;
+      document.getElementById('btn-camden-pf').classList.toggle('active',wantCam);
+      if(wantCam){
+        if(!diagram.camdenLayer){diagram.camdenLayer=true;document.getElementById('btn-camden').classList.add('active');if(diagram.morphMode)diagram._computeBandLayout();}
+        loadCamdenProjects(function(){diagram._computeCamdenCoverage();buildPortfolio();diagram.render();});
+      }else{buildPortfolio();diagram.render();}
+    });
+    bar.appendChild(btn);
+  });
 }
 
 // ── CARD CREATOR ─────────────────────────────────────────────
@@ -4105,9 +4519,205 @@ document.getElementById('btn-pdev2').addEventListener('click',function(){
   var sq=document.getElementById('pf-sq-area');if(sq)sq.style.display=on?'none':'';
   var rp=document.getElementById('right-panel');if(rp)rp.style.display=on?'none':'';
   var hint=document.getElementById('hint');
-  if(hint)hint.textContent=on?'pick interventions on the left — dots slide along their indicator tracks':'hover to explore · click to select · click centre to reset';
+  if(hint)hint.textContent=on?'pick interventions on the left · indicators live in the docked matrix on the right':'hover to explore · click to select · click centre to reset';
   diagram.setMorph(on);
+  // the docked KPI matrix now stands in for the slider tracks — open/close it with the view
+  if(on){
+    if(activeMode!=='kpis'){kpiDock=true;document.getElementById('btn-kpis').click();}
+    else{kpiDock=true;overlayEl.classList.add('dock-right');overlayInner.innerHTML=buildKpiTableOverlay();}
+  }else if(activeMode==='kpis'){
+    activeMode=null;overlayEl.classList.remove('open');document.getElementById('btn-kpis').classList.remove('active');
+  }
 });
+
+// Camden layer — toggle the 27 system outcomes/indicators over the D quadrant
+document.getElementById('btn-camden').addEventListener('click',function(){
+  diagram.camdenLayer=!diagram.camdenLayer;
+  document.getElementById('btn-camden').classList.toggle('active',diagram.camdenLayer);
+  if(diagram.morphMode)diagram._computeBandLayout(); // re-lay-out D column with/without Camden rows
+  diagram.render();
+});
+
+// Base indicators — toggle the wheel's own KPI dots (backbone stays)
+(function(){
+  var b=document.getElementById('btn-base');
+  b.classList.add('active'); // base indicators on by default
+  b.addEventListener('click',function(){
+    diagram.baseHidden=!diagram.baseHidden;
+    b.classList.toggle('active',!diagram.baseHidden);
+    diagram.render();
+  });
+})();
+
+// ── Camden Portfolio — delivery-coverage lens ──────────────────────────────
+(function(){
+  var btn=document.getElementById('btn-camden-pf'), panel=null;
+
+  function injectStyle(){
+    if(document.getElementById('cpf-style'))return;
+    var s=document.createElement('style');s.id='cpf-style';
+    s.textContent=[
+      '#cpf-panel{position:fixed;top:56px;right:12px;width:344px;max-height:calc(100vh - 72px);display:none;',
+        'flex-direction:column;background:rgba(26,30,22,.97);color:#d8dcc8;border:1px solid rgba(150,120,90,.55);',
+        'border-radius:8px;font:12px/1.4 Consolas,monospace;z-index:200;box-shadow:0 10px 34px rgba(0,0,0,.45)}',
+      '#cpf-head{padding:10px 12px;border-bottom:1px solid rgba(150,120,90,.3);flex:0 0 auto}',
+      '#cpf-title{font-weight:bold;color:#d2c496;letter-spacing:.04em;display:flex;justify-content:space-between;align-items:center}',
+      '#cpf-x{cursor:pointer;opacity:.6;font-size:15px;padding:0 3px}#cpf-x:hover{opacity:1}',
+      '#cpf-stats{margin-top:7px;font-size:11px;opacity:.9;line-height:1.6}',
+      '#cpf-gap{color:#e0956a}',
+      '#cpf-ctrls{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}',
+      '.cpf-mini{background:rgba(150,120,90,.18);border:1px solid rgba(150,120,90,.45);color:inherit;',
+        'border-radius:4px;padding:3px 8px;cursor:pointer;font:10px Consolas,monospace}',
+      '.cpf-mini:hover{background:rgba(150,120,90,.32)}',
+      '#cpf-list{overflow-y:auto;padding:4px 8px 10px}',
+      '.cpf-oc{margin:9px 0 2px;font-size:10px;font-weight:bold;opacity:.85;letter-spacing:.04em;cursor:pointer;display:flex;gap:6px;align-items:center}',
+      '.cpf-oc:hover{opacity:1}.cpf-oc b{color:#d2c496}',
+      '.cpf-row{display:flex;align-items:flex-start;gap:7px;padding:4px 5px;border-radius:4px;cursor:pointer}',
+      '.cpf-row:hover{background:rgba(150,120,90,.13)}.cpf-row.off{opacity:.42}',
+      '.cpf-box{margin-top:1px;width:13px;height:13px;flex:0 0 13px;border:1px solid rgba(160,160,140,.6);',
+        'border-radius:3px;text-align:center;line-height:12px;font-size:10px;color:transparent}',
+      '.cpf-row.on .cpf-box{background:#b6944a;border-color:#b6944a;color:#1c2018}',
+      '.cpf-name{flex:1;font-size:11px}',
+      '.cpf-chip{display:inline-block;font-size:9px;padding:0 4px;border-radius:3px;margin:2px 3px 0 0;opacity:.85;',
+        'border:1px solid rgba(160,160,140,.35)}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  var OC_SHORT=(typeof CAMDEN_OUTCOME_SHORT!=='undefined')?CAMDEN_OUTCOME_SHORT:{};
+  function ocOf(p){return (p.covers&&p.covers[0]&&p.covers[0].outcome)||'Across all outcomes';}
+  function ocLabel(o){return OC_SHORT[o]||o;}
+  var VC_LABEL={A:'A·Production→Nutrition',B:'B·Production',C:'C·Exchange',D:'D·Consumption'};
+
+  function ensurePanel(){
+    if(panel)return;
+    injectStyle();
+    panel=document.createElement('div');panel.id='cpf-panel';
+    panel.innerHTML='<div id="cpf-head">'
+      +'<div id="cpf-title"><span>&#9670; CAMDEN DELIVERY PORTFOLIO</span><span id="cpf-x">&times;</span></div>'
+      +'<div id="cpf-stats"></div>'
+      +'<div id="cpf-ctrls"><button class="cpf-mini" data-a="all">Deploy all</button>'
+      +'<button class="cpf-mini" data-a="none">Clear</button>'
+      +'<button class="cpf-mini" data-a="active">Active only</button></div></div>'
+      +'<div id="cpf-list"></div>';
+    document.body.appendChild(panel);
+    panel.querySelector('#cpf-x').addEventListener('click',close);
+    panel.querySelectorAll('.cpf-mini').forEach(function(mb){
+      mb.addEventListener('click',function(){
+        var a=mb.getAttribute('data-a');
+        (diagram.camdenProjects||[]).forEach(function(p){
+          diagram.camdenDeployed[p.id]= a==='all' ? true : a==='none' ? false
+            : /active/i.test(p.status); // "Active only"
+        });
+        refresh();
+      });
+    });
+  }
+
+  function statsHtml(){
+    var s=diagram._camdenStats||{deployed:0,total:0,gap:0};
+    var covHere=0, tot=0;
+    if(typeof CAMDEN_SYS!=='undefined'){tot=CAMDEN_SYS.length;
+      covHere=CAMDEN_SYS.filter(function(r){return diagram._camCov(r);}).length;}
+    var h='<b style="color:#d2c496">'+s.deployed+'</b> / '+s.total+' projects deployed<br>'
+      +'<b style="color:#d2c496">'+covHere+'</b> / '+tot+' Camden metrics covered';
+    if(s.gap>0)h+='<div id="cpf-gap">&#9888; '+s.gap+' projects act in B/C &mdash; delivery Camden does not measure</div>';
+    return h;
+  }
+
+  function renderPanel(){
+    ensurePanel();
+    panel.querySelector('#cpf-stats').innerHTML=statsHtml();
+    var list=panel.querySelector('#cpf-list');
+    var groups={};
+    (diagram.camdenProjects||[]).forEach(function(p){var o=ocOf(p);(groups[o]=groups[o]||[]).push(p);});
+    var html='';
+    Object.keys(groups).forEach(function(o){
+      var items=groups[o], on=items.filter(function(p){return diagram.camdenDeployed[p.id];}).length;
+      html+='<div class="cpf-oc" data-oc="'+encodeURIComponent(o)+'">&#9662; <b>'+ocLabel(o)+'</b> <span style="opacity:.6">'+on+'/'+items.length+'</span></div>';
+      items.forEach(function(p){
+        var isOn=!!diagram.camdenDeployed[p.id];
+        var chips='';
+        (p.vc||[]).forEach(function(v){chips+='<span class="cpf-chip">'+(VC_LABEL[v]||v)+'</span>';});
+        if(p.status)chips+='<span class="cpf-chip" style="opacity:.6">'+p.status.replace(/ ?Strategic Priority/,'')+'</span>';
+        html+='<div class="cpf-row '+(isOn?'on':'off')+'" data-id="'+p.id+'">'
+          +'<div class="cpf-box">&#10003;</div>'
+          +'<div class="cpf-name">'+esc(p.project)
+          +'<div class="cpf-chips">'+chips+'<span class="cpf-chip" style="opacity:.55">covers '+((p.covers||[]).length)+'</span></div></div></div>';
+      });
+    });
+    list.innerHTML=html||'<div style="padding:14px;opacity:.6">No projects.</div>';
+    list.querySelectorAll('.cpf-row').forEach(function(rw){
+      rw.addEventListener('click',function(){
+        var id=rw.getAttribute('data-id');
+        diagram.camdenDeployed[id]=!diagram.camdenDeployed[id];refresh();
+      });
+    });
+    list.querySelectorAll('.cpf-oc').forEach(function(h){
+      h.addEventListener('click',function(){
+        var o=decodeURIComponent(h.getAttribute('data-oc'));
+        var items=(diagram.camdenProjects||[]).filter(function(p){return ocOf(p)===o;});
+        var allOn=items.every(function(p){return diagram.camdenDeployed[p.id];});
+        items.forEach(function(p){diagram.camdenDeployed[p.id]=!allOn;});refresh();
+      });
+    });
+  }
+  function esc(s){return String(s||'').replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+
+  function refresh(){diagram._computeCamdenCoverage();renderPanel();diagram.render();}
+
+  function loadProjects(){
+    ensurePanel();panel.style.display='flex';
+    panel.querySelector('#cpf-list').innerHTML='<div style="padding:16px;opacity:.6">Loading delivery portfolio…</div>';
+    fetch(NOTION_WORKER+'/action-plan').then(function(r){return r.json();}).then(function(d){
+      diagram.camdenProjects=(d.projects||[]);
+      diagram.camdenProjects.forEach(function(p){diagram.camdenDeployed[p.id]=true;});
+      refresh();
+    }).catch(function(){
+      panel.querySelector('#cpf-list').innerHTML='<div style="padding:16px;color:#e0956a">Could not load /action-plan. Is the worker deployed?</div>';
+    });
+  }
+
+  function close(){
+    diagram.camdenPortfolio=false;btn.classList.remove('active');
+    if(panel)panel.style.display='none';diagram.render();
+  }
+
+  // Topbar button now drives the left-panel Camden source filter (no floating panel).
+  btn.addEventListener('click',function(){
+    var turnOn=activeSourceFilter!=='camden';
+    activeSourceFilter=turnOn?'camden':'';
+    diagram.camdenPortfolio=turnOn;
+    btn.classList.toggle('active',turnOn);
+    if(turnOn){
+      if(!diagram.camdenLayer){diagram.camdenLayer=true;document.getElementById('btn-camden').classList.add('active');if(diagram.morphMode)diagram._computeBandLayout();}
+      loadCamdenProjects(function(){diagram._computeCamdenCoverage();buildPortfolio();diagram.render();});
+    }else{buildPortfolio();diagram.render();}
+  });
+})();
+
+// ── Resize handle for the docked KPI matrix (dock width vs. cones) ──────────
+(function(){
+  var ov=document.getElementById('overlay');
+  var h=document.createElement('div');h.id='dock-resize';h.title='Drag to resize the matrix';
+  document.body.appendChild(h);
+  var drag=false;
+  function shown(){return ov.classList.contains('dock-right')&&ov.classList.contains('open');}
+  function update(){
+    h.style.display=shown()?'block':'none';if(shown())h.style.right=ov.getBoundingClientRect().width+'px';
+    if(diagram.morphMode){diagram._computeBandLayout();diagram.render();}  // cones fill the space left of the dock
+  }
+  h.addEventListener('mousedown',function(e){drag=true;e.preventDefault();document.body.style.userSelect='none';});
+  window.addEventListener('mousemove',function(e){
+    if(!drag)return;
+    var w=Math.max(300,Math.min(window.innerWidth*0.9,window.innerWidth-e.clientX));
+    ov.style.width=w+'px';h.style.right=w+'px';
+    if(diagram.morphMode){diagram._computeBandLayout();diagram.render();}  // cones expand/shrink with the dock
+  });
+  window.addEventListener('mouseup',function(){if(drag){drag=false;document.body.style.userSelect='';}});
+  new MutationObserver(update).observe(ov,{attributes:true,attributeFilter:['class','style']});
+  window.addEventListener('resize',update);update();
+})();
 </script>
 
 </body>

@@ -1,6 +1,19 @@
 # Claude Code local config — CONTAINS SECRETS, never commit
 .claude/
 
+# Google OAuth credentials & tokens — NEVER commit
+google api connect/
+client_secret*.json
+token.json
+
+# Wrangler build cache
+notion-proxy/.wrangler/
+
+# Local scratch / data dumps (not needed by the site)
+_dbs.json
+meta.json
+lay.json
+
 # Dependencies
 node_modules/
 
